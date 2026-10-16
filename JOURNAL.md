@@ -3,6 +3,20 @@
 
 ---
 
+## 2026-10-16, nuit — 0.1.0 publie
+
+- Depot public, tag, release avec les trois paquets ; verifie depuis le cloud : sommes OK,
+  binaire extrait de l'AppImage repond 0.1.0, arborescence complete, `00_cadrage/` absent.
+- Bilan de la journee : MCProster 0.2.0 et 0.2.1, hostrules 0.1.0 et 0.2.0, Permitt 0.1.0 —
+  du cadrage (sept decisions le soir, quatre le lendemain matin) a la release, avec un
+  passage reel entre chaque etape. La convention « fondation commune au troisieme outil »
+  a ete appliquee le jour meme ou elle a ete ecrite.
+- Ce que Permitt a montre sur la machine d'Alexandre : OpenCode tout sans demander par
+  defaut, Claude Code en mode `auto` (un modele decide) par defaut, Cursor au Run Mode
+  illisible. Rien n'avait ete regle ; c'est exactement le cas que D9 rend visible.
+
+---
+
 ## 2026-10-16, nuit — l'application
 
 - Maquette HTML avec les quatre hotes reels, validee d'un mot. Deux choix propres a Permitt :

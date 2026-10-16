@@ -29,6 +29,15 @@
 - [x] App iced : feuille, detail, constats, EN/FR, clair/sombre ; captures — 2026-10-16
 ## Etape 4. Paquets, depot, release 0.1.0 — sur accord
 - [x] deb / rpm / AppImage construits dans le cloud, SHA256SUMS verifie sur la machine — 2026-10-16
-- [ ] Commit 2 ; test du .deb sur la machine d'Alexandre
-- [ ] Depot public blackberrylabs/permitt, push, tag v0.1.0, release — sur accord
+- [x] Commit 2 ; .deb installe et teste sur la machine d'Alexandre (« Ok, c'est bon ») — 2026-10-16
+- [x] Depot public blackberrylabs/permitt, push, tag v0.1.0, release avec les 3 paquets ; verifie depuis le cloud (sommes, binaire, arborescence, 00_cadrage absent) — 2026-10-16
 ## Etape 5. README, captures, textes — decision d'Alexandre
+- [x] README avec captures et « Reading the sheet » — 2026-10-16
+- [ ] Textes de presentation (posts) — decision d'Alexandre, pas le jour de la release
+
+## Apres 0.1.0 (idees, non engagees)
+- Lecture SQLite `mode=ro` de `state.vscdb` pour le Run Mode de Cursor (cles `yolo*` observees) et Roo Code (D7 → 0.2)
+- Observer VS Code sur une machine qui a approuve un outil ; Kiro IDE `settings.json`
+- Lanceurs `.desktop` et scripts `~/.local/bin` passant des drapeaux
+- Antigravity CLI, Kilo Code quand leurs fichiers seront documentes
+- Fondation commune : extraire l'UI partagee (card/inner/pill/swatch, settings, i18n) — troisieme app, convention du 16/10
