@@ -114,11 +114,14 @@ pub fn run(rules: &Rules, shell_rules: &ShellRules, env: &Env, opts: Options) ->
 
     // State findings, for the user context and for each project.
     for h in &hosts {
-        state_findings(h, env, &mut findings);
+        state_findings(h, None, env, &mut findings);
     }
     for p in &projects {
         for h in &p.hosts {
-            state_findings(h, env, &mut findings);
+            // Only what the project changes: a state equal to the user-level one is not
+            // a second finding.
+            let base = hosts.iter().find(|b| b.host == h.host);
+            state_findings(h, base, env, &mut findings);
         }
     }
     dedupe(&mut findings);
@@ -151,8 +154,13 @@ fn differs(a: &HostSheet, b: &HostSheet) -> bool {
     })
 }
 
-fn state_findings(h: &HostSheet, env: &Env, out: &mut Vec<Finding>) {
+fn state_findings(h: &HostSheet, base: Option<&HostSheet>, env: &Env, out: &mut Vec<Finding>) {
     for c in &h.capabilities {
+        if let Some(b) = base {
+            if b.state(c.capability).map(|s| s.state) == Some(c.state) {
+                continue;
+            }
+        }
         let (kind, verb) = match c.state {
             State::Auto => (FindingKind::RunsWithoutAsking, "without asking"),
             State::Judged => (FindingKind::JudgedByModel, "when a model allows it"),

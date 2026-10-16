@@ -22,7 +22,8 @@
 - [x] Faux home (44 fichiers), 11 tests dont « rien n'est ecrit » et « aucun secret » ; clippy propre — 2026-10-16
 ## Etape 2. CLI et passage reel
 - [x] CLI roster | findings | files | shell | hosts — 2026-10-16
-- [ ] Passage reel sur la machine d'Alexandre (Claude Code, Cursor, OpenCode, VS Code)
+- [x] Passage reel : 4 hotes, OpenCode tout `auto (default)`, Cursor `unknown` (Run Mode), Claude Code `judged`, hook PreToolUse de Nimeria_poa vu ; constats de projet dedoublonnes — 2026-10-16
+- [ ] Commit 1
 ## Etape 3. Application iced (maquette validee avant le code)
 ## Etape 4. Paquets, depot, release 0.1.0 — sur accord
 ## Etape 5. README, captures, textes — decision d'Alexandre

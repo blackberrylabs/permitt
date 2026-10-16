@@ -16,7 +16,8 @@
   non → `sandboxed`) ; un motif seul ne tranche pas un inconnu (l'allowlist de Cursor sous
   un Run Mode illisible reste `unknown`, la liste dans les preuves).
 - Le CLI Cline (`toolAutoApprove`) ecrasait l'extension au meme niveau : ramene a une note.
-  Premier passage reel a faire.
+  Premier passage reel reussi : la feuille dit vrai sur quatre hotes reels ; les constats de
+  projet repetaient ceux du niveau utilisateur quand l'etat etait le meme — corrige.
 
 ---
 
