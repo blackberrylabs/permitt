@@ -3,6 +3,24 @@
 
 ---
 
+## 2026-10-16, tard — le rapport pour la tour
+
+- La tour de controle Blackberrylabs est cadree (BRIEF valide) et son contrat publie :
+  `bbl-report` 0.1.0. Permitt est le premier module a le parler : `permitt report` (toujours
+  JSON) et `permitt-app --select host[:capability]`, qui remplace la variable
+  `PERMITT_SELECT` sans la casser.
+- Rien d'inedit dans le rapport : les quatre chiffres des cartes, les constats, les fichiers,
+  les `hints.act`, les URL de documentation ; secrets masques comme partout. Les constats
+  `unknown` (D10) y entrent en information, avec la raison. Un constat de shell retrouve le
+  texte de sa ligne (masque) et son fichier comme preuve ; son id est le drapeau.
+- Mapping sur les quatre gravites ecrit dans le CHANGELOG : contournement shell = agir
+  maintenant ; agit sans demander / un modele decide = a regarder ; liste de refus seule /
+  non honore = bon a savoir ; illisible, contradictoire, inconnu = information.
+- Test de conformite sur la maison factice (8 tests coeur) ; `--select codex:files` verifie
+  a l'ecran dans le cloud. Interface et sortie `--json` inchangees.
+
+---
+
 ## 2026-10-16, nuit — 0.1.0 publie
 
 - Depot public, tag, release avec les trois paquets ; verifie depuis le cloud : sommes OK,

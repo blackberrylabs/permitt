@@ -89,6 +89,7 @@ permitt findings             # what runs without asking, and why
 permitt files                # the files that were looked at
 permitt shell                # bypass flags found in shell start-up files
 permitt hosts                # what Permitt knows about each host, and how
+permitt report               # the inventory as a bbl-report/1 document (Blackberrylabs tower)
 permitt --json               # for scripts
 permitt --home /mnt/old      # inventory another home
 permitt --root ~/work/app    # add a project root
@@ -126,8 +127,10 @@ French on demand; light and dark.
 A Rust workspace: `crates/core` (rules, sheets, shell scan, findings — no UI, no network),
 `crates/cli`, `crates/app` (iced). Host rules in `hosts/*.toml`, embedded in the binary. The rule schema,
 path resolution, file readers and secret masking come from
-[`hostrules`](https://github.com/blackberrylabs/hostrules), the crate shared by the
-Blackberrylabs tools. `#![forbid(unsafe_code)]` everywhere. The design brief, plan and
+[`bbl-hostrules`](https://github.com/blackberrylabs/bbl-hostrules), the crate shared by the
+Blackberrylabs tools; the interface from [`bbl-ui`](https://github.com/blackberrylabs/bbl-ui);
+`permitt report` speaks [`bbl-report`](https://github.com/blackberrylabs/bbl-report), the
+contract of the Blackberrylabs control tower. `#![forbid(unsafe_code)]` everywhere. The design brief, plan and
 journal are kept in French at the root; code, comments and documentation are in English.
 
 By [Alexandre Do](https://github.com/blackberrylabs), who also made

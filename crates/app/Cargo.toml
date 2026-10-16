@@ -13,7 +13,7 @@ path = "src/main.rs"
 
 [dependencies]
 permitt-core = { path = "../core" }
-hostrules.workspace = true
+bbl-hostrules.workspace = true
 iced = { version = "=0.13.1", features = ["tokio"] }
 bbl-ui = { git = "https://github.com/blackberrylabs/bbl-ui", tag = "v0.1.0" }
 serde.workspace = true

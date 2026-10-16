@@ -35,9 +35,12 @@
 - [x] README avec captures et « Reading the sheet » — 2026-10-16
 - [ ] Textes de presentation (posts) — decision d'Alexandre, pas le jour de la release
 
+## Vers 0.2 — module de la tour de controle
+- [x] `permitt report` (`bbl-report/1`), `--select` dans l'app, mapping des gravites dans le CHANGELOG — 2026-10-16
+
 ## Apres 0.1.0 (idees, non engagees)
 - Lecture SQLite `mode=ro` de `state.vscdb` pour le Run Mode de Cursor (cles `yolo*` observees) et Roo Code (D7 → 0.2)
 - Observer VS Code sur une machine qui a approuve un outil ; Kiro IDE `settings.json`
 - Lanceurs `.desktop` et scripts `~/.local/bin` passant des drapeaux
 - Antigravity CLI, Kilo Code quand leurs fichiers seront documentes
-- Fondation commune : extraire l'UI partagee (card/inner/pill/swatch, settings, i18n) — troisieme app, convention du 16/10
+- ~~Fondation commune : extraire l'UI partagee~~ — fait, `bbl-ui` 0.1.0 (16/10)

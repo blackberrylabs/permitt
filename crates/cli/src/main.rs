@@ -1,4 +1,4 @@
-//! Permitt command line: hosts | roster | findings | files | shell, `--json` for scripts.
+//! Permitt command line: hosts | roster | findings | files | shell | report, `--json` for scripts.
 
 use std::io::Write;
 use std::path::PathBuf;
@@ -47,6 +47,9 @@ enum Command {
     Hosts,
     /// The bypass flags found in shell start-up files.
     Shell,
+    /// The inventory as a `bbl-report/1` document for the Blackberrylabs control tower
+    /// (always JSON).
+    Report,
 }
 
 macro_rules! out {
@@ -78,12 +81,19 @@ fn main() -> Result<()> {
     if matches!(cli.command, Some(Command::Hosts)) {
         return hosts(&rules, &shell, cli.json);
     }
+    let started = std::time::Instant::now();
     let inv = inventory::run(&rules, &shell, &env, opts);
+    let duration_ms = started.elapsed().as_millis() as u64;
     match cli.command.unwrap_or(Command::Roster) {
         Command::Roster => roster(&inv, &env, cli.json),
         Command::Findings => findings(&inv, &env, cli.json),
         Command::Files => files(&inv, &env, cli.json),
         Command::Shell => shell_cmd(&inv, &env, cli.json),
+        Command::Report => {
+            let report = permitt_core::report::build(&inv, &rules, &env, duration_ms);
+            let mut o = std::io::stdout().lock();
+            let _ = o.write_all(report.to_json().as_bytes());
+        }
         Command::Hosts => unreachable!(),
     }
     Ok(())
@@ -227,7 +237,7 @@ fn files(inv: &Inventory, env: &Env, json: bool) {
             (None, true) => format!("{} setting(s)", f.settings_found),
             (None, false) => "absent".to_string(),
         };
-        let observed = if f.source_kind == hostrules::SourceKind::Observed {
+        let observed = if f.source_kind == bbl_hostrules::SourceKind::Observed {
             " [observed]"
         } else {
             ""

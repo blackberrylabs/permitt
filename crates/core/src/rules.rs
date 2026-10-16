@@ -1,12 +1,12 @@
-//! Permitt's host rules: the common schema comes from `hostrules`; this module adds what a
+//! Permitt's host rules: the common schema comes from `bbl-hostrules`; this module adds what a
 //! permission inventory needs — the level of every file, and per host the sourced defaults,
 //! the meaning of each setting, the precedence and the parts that cannot be read.
 //! Schema documented in `docs/hosts.md`.
 
 use std::collections::BTreeMap;
 
-use hostrules::rules::{Source, Status};
-use hostrules::{Extension, HostExtension};
+use bbl_hostrules::rules::{Source, Status};
+use bbl_hostrules::{Extension, HostExtension};
 use serde::{Deserialize, Serialize};
 
 use crate::model::{Capability, Level, PrecedenceStatus, State};
@@ -18,8 +18,8 @@ pub struct PermLocation {
 }
 
 impl Extension for PermLocation {
-    fn validate(loc: &hostrules::Location<Self>) -> Result<(), String> {
-        use hostrules::Scope;
+    fn validate(loc: &bbl_hostrules::Location<Self>) -> Result<(), String> {
+        use bbl_hostrules::Scope;
         let ok = match loc.ext.level {
             Level::Managed => loc.scope == Scope::System,
             Level::User => loc.scope == Scope::User,
@@ -181,7 +181,7 @@ pub struct PermHost {
 }
 
 impl HostExtension for PermHost {
-    fn validate<X: Extension>(rule: &hostrules::HostRule<X, Self>) -> Result<(), String> {
+    fn validate<X: Extension>(rule: &bbl_hostrules::HostRule<X, Self>) -> Result<(), String> {
         if rule.status != Status::Active {
             return Ok(());
         }
@@ -220,7 +220,7 @@ impl HostExtension for PermHost {
             if s.source.quote.trim().is_empty() {
                 return Err(at("source needs a quote".into()));
             }
-            if s.source.kind != hostrules::SourceKind::Observed && s.source.url.is_none() {
+            if s.source.kind != bbl_hostrules::SourceKind::Observed && s.source.url.is_none() {
                 return Err(at(
                     "a documentation or source-code source needs a URL".into()
                 ));
@@ -303,9 +303,9 @@ impl HostExtension for PermHost {
     }
 }
 
-pub type Location = hostrules::Location<PermLocation>;
-pub type HostRule = hostrules::HostRule<PermLocation, PermHost>;
-pub type Rules = hostrules::Rules<PermLocation, PermHost>;
+pub type Location = bbl_hostrules::Location<PermLocation>;
+pub type HostRule = bbl_hostrules::HostRule<PermLocation, PermHost>;
+pub type Rules = bbl_hostrules::Rules<PermLocation, PermHost>;
 
 /// A bypass flag or variable to look for in shell start-up files (D2): a closed, sourced list.
 #[derive(Debug, Clone, Deserialize, Serialize)]

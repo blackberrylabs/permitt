@@ -182,13 +182,13 @@ impl fmt::Display for Level {
 /// checked.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SourceRef {
-    pub kind: hostrules::SourceKind,
+    pub kind: bbl_hostrules::SourceKind,
     pub url: Option<String>,
     pub quote: String,
 }
 
-impl From<&hostrules::Source> for SourceRef {
-    fn from(s: &hostrules::Source) -> Self {
+impl From<&bbl_hostrules::Source> for SourceRef {
+    fn from(s: &bbl_hostrules::Source) -> Self {
         SourceRef {
             kind: s.kind,
             url: s.url.clone(),
@@ -356,5 +356,5 @@ pub struct FileStatus {
     pub exists: bool,
     pub error: Option<String>,
     pub settings_found: usize,
-    pub source_kind: hostrules::SourceKind,
+    pub source_kind: bbl_hostrules::SourceKind,
 }

@@ -3,8 +3,8 @@
 
 use std::path::PathBuf;
 
-use hostrules::resolve::project_roots;
-use hostrules::Env;
+use bbl_hostrules::resolve::project_roots;
+use bbl_hostrules::Env;
 use serde::{Deserialize, Serialize};
 
 use crate::model::{Capability, FileStatus, Finding, FindingKind, HostSheet, State};
@@ -28,7 +28,7 @@ pub struct Inventory {
     pub shell_files: Vec<PathBuf>,
     pub findings: Vec<Finding>,
     pub roots: Vec<PathBuf>,
-    pub not_read: Vec<hostrules::rules::NotRead>,
+    pub not_read: Vec<bbl_hostrules::rules::NotRead>,
 }
 
 #[derive(Debug, Clone, Copy, Default)]

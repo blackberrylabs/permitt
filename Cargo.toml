@@ -10,7 +10,8 @@ authors = ["Alexandre Do"]
 repository = "https://github.com/blackberrylabs/permitt"
 
 [workspace.dependencies]
-hostrules = { git = "https://github.com/blackberrylabs/hostrules", tag = "v0.2.0" }
+bbl-hostrules = { git = "https://github.com/blackberrylabs/bbl-hostrules", tag = "v0.3.0" }
+bbl-report = { git = "https://github.com/blackberrylabs/bbl-report", tag = "v0.1.0" }
 anyhow = "1.0"
 thiserror = "2.0"
 serde = { version = "1.0", features = ["derive"] }

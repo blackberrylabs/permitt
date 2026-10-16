@@ -325,3 +325,40 @@ fn nothing_is_written_and_no_clear_secret_appears() {
     );
     assert!(!json.contains("sk-ant-api03-SHOULD"));
 }
+
+/// The `bbl-report/1` view conforms, carries the same figures as the inventory, and maps
+/// every kind of finding onto the common scale.
+#[test]
+fn report_conforms() {
+    let (tmp, inv) = run();
+    let env = Env::fixture(tmp.path(), Os::Linux);
+    let rules = rules::embedded();
+    let report = permitt_core::report::build(&inv, &rules, &env, 7);
+    let json = report.to_json();
+    let back = bbl_report::conformance::check(&json).expect("the report conforms");
+    assert_eq!(back.module.id, "permitt");
+    assert_eq!(back.duration_ms, 7);
+    let figure = |k: &str| back.summary.iter().find(|s| s.key == k).unwrap().value.clone();
+    assert_eq!(figure("hosts"), inv.hosts.len().to_string());
+    assert_eq!(figure("findings"), inv.findings.len().to_string());
+    let shell_hits: usize = inv.hosts.iter().map(|h| h.shell.len()).sum();
+    assert_eq!(figure("shell"), shell_hits.to_string());
+    // Every inventory finding is in the report, plus one per host with an unknown state.
+    let unknown_hosts = inv
+        .hosts
+        .iter()
+        .filter(|h| h.capabilities.iter().any(|c| c.state == State::Unknown))
+        .count();
+    assert_eq!(back.findings.len(), inv.findings.len() + unknown_hosts);
+    assert!(back.findings.iter().any(|f| f.kind == "shell-bypass" && f.severity == bbl_report::Severity::ActNow));
+    assert!(back.findings.iter().any(|f| f.kind == "runs-without-asking" && f.severity == bbl_report::Severity::Review));
+    assert!(back.findings.iter().any(|f| f.kind == "unknown" && f.severity == bbl_report::Severity::Info));
+    // Every finding opens the app at a cell, and secrets never leak.
+    for f in &back.findings {
+        let open = f.open.as_ref().unwrap();
+        assert_eq!(open.app, "permitt-app");
+        assert_eq!(open.args[0], "--select");
+        assert!(inv.hosts.iter().any(|h| open.args[1].starts_with(&h.host)), "{}", open.args[1]);
+    }
+    assert!(!json.contains("SHOULDNEVERSHOW") && !json.contains("SHOULD-NEVER-SHOW"), "a masked secret stays masked");
+}

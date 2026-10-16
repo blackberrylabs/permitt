@@ -34,7 +34,7 @@ One **state** per capability — a fact, not a score:
 ## Rule schema
 
 The common part (identity, locations, paths per OS, sources, validation) comes from the
-shared crate [`hostrules`](https://github.com/blackberrylabs/hostrules). Permitt adds
+shared crate [`bbl-hostrules`](https://github.com/blackberrylabs/bbl-hostrules). Permitt adds
 `level` to every location and, per host, `binaries`, `[defaults]`, `[[settings]]`,
 `[precedence]` and `[[unknown]]`.
 

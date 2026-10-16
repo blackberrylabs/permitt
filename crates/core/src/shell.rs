@@ -3,8 +3,8 @@
 
 use std::path::PathBuf;
 
-use hostrules::secrets;
-use hostrules::Env;
+use bbl_hostrules::secrets;
+use bbl_hostrules::Env;
 use regex::Regex;
 
 use crate::model::{ShellHit, SourceRef};

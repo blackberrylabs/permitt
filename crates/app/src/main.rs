@@ -12,7 +12,7 @@ use iced::widget::{
 };
 use iced::{Background, Border, Color, Element, Length, Task, Theme};
 
-use hostrules::SourceKind;
+use bbl_hostrules::SourceKind;
 use permitt_core::model::{
     Capability, CapabilityState, Evidence, Finding, FindingKind, HostSheet, Level, State,
 };
@@ -32,6 +32,29 @@ struct Extra {
     /// `false` to leave `~/.bashrc` and friends unread (BRIEF R4).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     read_shell: Option<bool>,
+}
+
+/// The `--select` argument, or the `PERMITT_SELECT` variable.
+fn requested_selection() -> Option<String> {
+    let mut args = std::env::args().skip(1);
+    while let Some(a) = args.next() {
+        if a == "--select" {
+            return args.next();
+        }
+        if let Some(v) = a.strip_prefix("--select=") {
+            return Some(v.to_string());
+        }
+    }
+    std::env::var("PERMITT_SELECT").ok()
+}
+
+/// `host:capability` → that cell; `host` alone → its first column.
+fn parse_selection(v: &str) -> Option<(String, Capability)> {
+    match v.split_once(':') {
+        Some((h, c)) => Capability::parse(c).map(|c| (h.to_string(), c)),
+        None if !v.is_empty() => Some((v.to_string(), Capability::Commands)),
+        None => None,
+    }
 }
 
 fn main() -> iced::Result {
@@ -168,14 +191,11 @@ impl App {
                 self.inventory = Some(inv);
                 self.loading = false;
                 self.error = None;
-                // `PERMITT_SELECT=host:capability` preselects a cell (documentation screenshots).
+                // `--select host[:capability]` (the control tower) or `PERMITT_SELECT=…`
+                // (documentation screenshots) preselects a cell.
                 if self.selected.is_none() {
-                    if let Ok(v) = std::env::var("PERMITT_SELECT") {
-                        if let Some((h, c)) = v.split_once(':') {
-                            if let Some(c) = Capability::parse(c) {
-                                self.selected = Some((h.to_string(), c));
-                            }
-                        }
+                    if let Some(v) = requested_selection() {
+                        self.selected = parse_selection(&v);
                     }
                 }
                 self.refresh_status();

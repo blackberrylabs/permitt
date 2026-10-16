@@ -2,11 +2,32 @@
 
 ## [Unreleased]
 
+### Added
+
+- `permitt report`: the inventory as a [`bbl-report/1`](https://github.com/blackberrylabs/bbl-report)
+  document for the Blackberrylabs control tower (always JSON). Nothing in it is new: the four
+  KPI figures, the findings, the files and the `act` hints the CLI and the app already show,
+  secrets masked as everywhere else. Permitt's findings map onto the four common severities
+  as follows — the tower never reinterprets:
+
+  | Permitt | Common severity |
+  |---|---|
+  | shell bypass | 1 · act now |
+  | runs without asking, a model decides | 2 · review |
+  | deny list only, not honoured here | 3 · good to know |
+  | unreadable, doc contradicts itself, state that cannot be read (`unknown`) | 4 · information |
+
+- `permitt-app --select host[:capability]` opens the app on that cell, the way the tower
+  does; `PERMITT_SELECT` still works for screenshots.
+
 ### Changed
 
 - The interface building blocks, palette, preferences and translated strings now come from
   the shared crate [`bbl-ui`](https://github.com/blackberrylabs/bbl-ui), like the other
   Blackberrylabs tools. Nothing visible changes.
+- The shared crate `hostrules` is now
+  [`bbl-hostrules`](https://github.com/blackberrylabs/bbl-hostrules) 0.3.0 — a rename, same
+  code. Nothing changes in the output.
 
 ## [0.1.0] — 2026-10-16
 
