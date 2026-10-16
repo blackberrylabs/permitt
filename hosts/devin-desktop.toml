@@ -1,0 +1,134 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "devin-desktop"
+name = "Devin Desktop (Windsurf)"
+vendor = "Cognition"
+kind = "editor"
+status = "active"
+binaries = ["windsurf", "devin"]
+
+# Two agents share the application: Cascade (legacy Windsurf agent) whose auto-execution
+# level is not in a documented file, and Devin Local / Devin CLI whose permissions are.
+[defaults]
+commands = "asks"
+files = "asks"
+network = "asks"
+mcp = "asks"
+note = "Devin Local / CLI in Normal mode: read-only tools run automatically; fetch, shell execution and file edits prompt; MCP tool calls prompt. Cascade's own level is not readable (see unknown)."
+[defaults.source]
+kind = "documentation"
+url = "https://docs.devin.ai/desktop/devin-local"
+read_on = 2026-10-16
+quote = "Unlike Cascade, the default configuration of the Devin Local agent prompts for approval before calling any MCP tool."
+
+[precedence]
+order = ["local", "project", "user"]
+lists = "merged"
+status = "documented"
+note = "organization (not on disk) > session grants > project local > project > user; deny → ask → allow"
+[precedence.source]
+kind = "documentation"
+url = "https://docs.devin.ai/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "Organization-level deny and ask rules cannot be overridden by project or user config."
+
+[[unknown]]
+capabilities = ["commands"]
+overrides_state = false
+reason = "Cascade's terminal auto-execution level (Disabled / Allowlist Only / Auto / Turbo) and its allow and deny lists are set in the Devin Settings panel; no settings.json key or file is documented (the likely store, ~/.codeium/user_settings.pb, is an undocumented protobuf)"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "json"
+path.linux = ["${XDG_CONFIG_HOME}/devin/config.json", "~/.config/devin/config.json"]
+path.macos = "~/.config/devin/config.json"
+path.windows = "%APPDATA%/devin/config.json"
+[locations.source]
+kind = "documentation"
+url = "https://docs.devin.ai/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "User ~/.config/devin/config.json or %APPDATA%\\devin\\config.json"
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "json"
+path.any = ".devin/config.json"
+[locations.source]
+kind = "documentation"
+url = "https://docs.devin.ai/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "Project .devin/config.json (shared)"
+
+[[locations]]
+scope = "project"
+level = "local"
+format = "json"
+path.any = ".devin/config.local.json"
+[locations.source]
+kind = "documentation"
+url = "https://docs.devin.ai/cli/reference/permissions"
+read_on = 2026-10-16
+quote = ".devin/config.local.json"
+
+[[settings]]
+key = "permissions.allow"
+kind = "rules"
+effect = "allow"
+[settings.tool_map]
+Exec = "commands"
+exec = "commands"
+Write = "files"
+edit = "files"
+Fetch = "network"
+Read = "ignore"
+read = "ignore"
+grep = "ignore"
+glob = "ignore"
+"mcp__*" = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://docs.devin.ai/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "Allow rules auto-approve actions without prompting … Permissions can be scoped to file reads, file writes, command execution, HTTP fetches, and MCP tools."
+
+[[settings]]
+key = "permissions.ask"
+kind = "rules"
+effect = "ask"
+[settings.tool_map]
+Exec = "commands"
+exec = "commands"
+Write = "files"
+edit = "files"
+Fetch = "network"
+Read = "ignore"
+read = "ignore"
+"mcp__*" = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://docs.devin.ai/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "Ask rules always prompt for approval"
+
+[[settings]]
+key = "permissions.deny"
+kind = "rules"
+effect = "deny"
+guard = "deny rules"
+[settings.tool_map]
+Exec = "commands"
+exec = "commands"
+Write = "files"
+edit = "files"
+Fetch = "network"
+Read = "ignore"
+read = "ignore"
+"mcp__*" = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://docs.devin.ai/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "Deny rules block actions entirely (highest priority) … A deny rule always wins."

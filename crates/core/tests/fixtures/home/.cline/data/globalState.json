@@ -1,0 +1,14 @@
+{
+  "autoApprovalSettings": {
+    "version": 19,
+    "enabled": true,
+    "actions": {
+      "readFiles": true,
+      "editFiles": true,
+      "executeSafeCommands": true,
+      "useBrowser": false,
+      "useMcp": true
+    }
+  },
+  "apiKey": "sk-SHOULDNEVERSHOW0123456789abcdef"
+}

@@ -1,0 +1,7 @@
+model = "o4"
+sandbox_mode = "danger-full-access"
+approval_policy = "never"
+
+[mcp_servers.github]
+command = "npx"
+default_tools_approval_mode = "auto"

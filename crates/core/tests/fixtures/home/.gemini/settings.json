@@ -1,0 +1,24 @@
+{
+  "general": {
+    "defaultApprovalMode": "auto_edit"
+  },
+  "tools": {
+    "allowed": [
+      "run_shell_command(git)",
+      "write_file",
+      "my_mcp_tool"
+    ],
+    "sandbox": "docker"
+  },
+  "security": {
+    "disableYoloMode": true
+  },
+  "mcpServers": {
+    "gh": {
+      "command": "npx",
+      "env": {
+        "GITHUB_TOKEN": "ghp_SHOULDNEVERSHOW0123456789abcdefghij"
+      }
+    }
+  }
+}

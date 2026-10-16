@@ -1,0 +1,187 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "zed"
+name = "Zed"
+vendor = "Zed Industries"
+kind = "editor"
+status = "active"
+binaries = ["zed", "zeditor"]
+
+[defaults]
+commands = "asks"
+files = "asks"
+network = "asks"
+mcp = "asks"
+note = "tool approval defaults to confirm for every permission-gated tool (terminal, edit_file, write_file, delete_path, fetch, search_web, MCP tools); network inside the sandbox is blocked until a host is approved"
+[defaults.source]
+kind = "documentation"
+url = "https://zed.dev/docs/ai/tool-permissions"
+read_on = 2026-10-16
+quote = "In Zed v0.224.0 and above, tool approval is controlled by agent.tool_permissions.default. … In earlier versions, it was controlled by the agent.always_allow_tool_actions boolean (default false)."
+
+[precedence]
+order = ["project", "user"]
+lists = "merged"
+status = "documented"
+note = "rule precedence: built-in security rules > always_deny > always_confirm > always_allow > tool default > global default; always_* patterns accumulate across layers and cannot be removed by a higher layer"
+[precedence.source]
+kind = "documentation"
+url = "https://zed.dev/docs/configuring-zed"
+read_on = 2026-10-16
+quote = "1. Default settings 2. User settings 3. Project settings — Later layers override earlier ones. For object settings (like terminal), properties merge rather than replace entirely."
+
+[[unknown]]
+capabilities = ["mcp"]
+overrides_state = false
+reason = "worktree trust (which lets project MCP servers start) is persisted in Zed's internal SQLite database, not in a settings file"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "jsonc"
+path.any = ["${XDG_CONFIG_HOME}/zed/settings.json", "~/.config/zed/settings.json"]
+path.windows = "%APPDATA%/Zed/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://zed.dev/docs/configuring-zed"
+read_on = 2026-10-16
+quote = "Linux ~/.config/zed/settings.json (or $XDG_CONFIG_HOME/zed/settings.json) … The syntax is JSON with support for // comments."
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "jsonc"
+path.any = ".zed/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://zed.dev/docs/configuring-zed"
+read_on = 2026-10-16
+quote = ".zed/settings.json in project root"
+
+[[settings]]
+key = "agent.tool_permissions.default"
+kind = "mode"
+[settings.states.confirm]
+all = "asks"
+[settings.states.allow]
+all = "auto"
+_note = "bypasses confirmation prompts for most tools; always_deny, always_confirm, built-in rules and Zed's own settings directories still prompt or block"
+[settings.states.deny]
+all = "off"
+[settings.source]
+kind = "documentation"
+url = "https://zed.dev/docs/ai/tool-permissions"
+read_on = 2026-10-16
+quote = "agent.tool_permissions.default: \"confirm\" (default) / \"allow\" / \"deny\" — global fallback for permission-gated tools"
+
+[[settings]]
+key = "agent.always_allow_tool_actions"
+kind = "mode"
+[settings.states."true"]
+all = "auto"
+_note = "legacy (before v0.224.0): every tool action allowed without confirmation"
+[settings.states."false"]
+_note = "legacy: confirm"
+[settings.source]
+kind = "documentation"
+url = "https://zed.dev/docs/ai/tool-permissions"
+read_on = 2026-10-16
+quote = "In earlier versions, it was controlled by the agent.always_allow_tool_actions boolean (default false)."
+
+[[settings]]
+key = "agent.tool_permissions.tools.*.default"
+kind = "mode"
+[settings.tool_map]
+terminal = "commands"
+edit_file = "files"
+write_file = "files"
+delete_path = "files"
+move_path = "files"
+copy_path = "files"
+create_directory = "files"
+fetch = "network"
+search_web = "network"
+"mcp:*" = "mcp"
+skill = "ignore"
+_default = "ignore"
+[settings.states.allow]
+all = "auto"
+[settings.states.confirm]
+all = "asks"
+[settings.states.deny]
+all = "off"
+[settings.source]
+kind = "documentation"
+url = "https://zed.dev/docs/ai/tool-permissions"
+read_on = 2026-10-16
+quote = "agent.tool_permissions.tools.<tool>.default: per-tool allow/deny/confirm — When unset, inherits from the global tool_permissions.default."
+
+[[settings]]
+key = "agent.tool_permissions.tools.*.always_allow"
+kind = "object-rules"
+effect = "allow"
+[settings.tool_map]
+terminal = "commands"
+edit_file = "files"
+write_file = "files"
+delete_path = "files"
+move_path = "files"
+copy_path = "files"
+create_directory = "files"
+fetch = "network"
+search_web = "network"
+"mcp:*" = "mcp"
+_default = "ignore"
+[settings.source]
+kind = "documentation"
+url = "https://zed.dev/docs/ai/tool-permissions"
+read_on = 2026-10-16
+quote = "always_allow / always_deny / always_confirm: arrays of { \"pattern\": \"<rust regex>\", \"case_sensitive\": false }"
+note = "one pattern per entry, attributed to the tool named by the wildcard"
+
+[[settings]]
+key = "agent.sandbox_permissions.allow_unsandboxed"
+kind = "mode"
+[settings.states."true"]
+_note = "sandboxing turned off entirely for terminal commands"
+[settings.source]
+kind = "documentation"
+url = "https://zed.dev/docs/ai/sandboxing"
+read_on = 2026-10-16
+quote = "allow_unsandboxed: Turn sandboxing off entirely for Zed Agent terminal commands."
+
+[[settings]]
+key = "agent.sandbox_permissions.allow_all_hosts"
+kind = "mode"
+[settings.states."true"]
+network = "auto"
+_note = "sandboxed commands may reach any host"
+[settings.source]
+kind = "documentation"
+url = "https://zed.dev/docs/ai/sandboxing"
+read_on = 2026-10-16
+quote = "Network access is blocked unless you approve a host-specific or unrestricted network sandbox request."
+
+[[settings]]
+key = "session.trust_all_worktrees"
+kind = "mode"
+[settings.states."true"]
+_note = "every worktree is trusted: project settings and MCP servers load without a prompt"
+[settings.source]
+kind = "documentation"
+url = "https://zed.dev/docs/worktree-trust"
+read_on = 2026-10-16
+quote = "Though not recommended, users can trust all worktrees with this setting"
+
+[[settings]]
+key = "disable_ai"
+kind = "mode"
+[settings.states."true"]
+all = "off"
+_note = "all AI features are disabled"
+[settings.source]
+kind = "documentation"
+url = "https://zed.dev/docs/ai/configuration"
+read_on = 2026-10-16
+quote = "When AI is turned off, all AI features are disabled."

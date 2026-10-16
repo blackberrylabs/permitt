@@ -1,0 +1,3 @@
+yes-always: true
+auto-test: true
+openai-api-key: sk-SHOULDNEVERSHOW0123456789abcdef

@@ -1,0 +1,19 @@
+[package]
+name = "permitt-cli"
+description = "Command line of Permitt"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "permitt"
+path = "src/main.rs"
+
+[dependencies]
+permitt-core = { path = "../core" }
+hostrules.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+serde_json.workspace = true

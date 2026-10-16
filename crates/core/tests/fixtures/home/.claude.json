@@ -1,0 +1,11 @@
+{
+  "projects": {
+    "__HOME__/proj": {
+      "hasTrustDialogAccepted": true
+    },
+    "/nonexistent/old": {}
+  },
+  "oauthAccount": {
+    "accessToken": "sk-ant-api03-SHOULD-NEVER-SHOW-0123456789abcdef"
+  }
+}

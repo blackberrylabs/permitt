@@ -1,0 +1,9 @@
+{
+  "type": "workspace_readwrite",
+  "networkPolicy": {
+    "default": "deny",
+    "allow": [
+      "crates.io"
+    ]
+  }
+}

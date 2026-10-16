@@ -1,0 +1,135 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "cline"
+name = "Cline"
+vendor = "Cline Bot Inc."
+kind = "extension"
+status = "active"
+binaries = ["cline"]
+
+[defaults]
+commands = "asks"
+files = "auto"
+network = "auto"
+mcp = "auto"
+note = "built-in auto-approval: read and edit files, use the browser (web fetch/search) and MCP servers run without asking; executing commands asks (executeSafeCommands false). Older installs may still carry the removed YOLO toggle."
+[defaults.source]
+kind = "source-code"
+url = "https://github.com/cline/cline/blob/01b8a9724da905423e636396d7fb4acdf47796bb/apps/vscode/src/shared/AutoApprovalSettings.ts"
+read_on = 2026-10-16
+quote = "DEFAULT_AUTO_APPROVAL_SETTINGS: actions: { readFiles: true, editFiles: true, executeSafeCommands: false, useBrowser: true, useMcp: true }"
+
+[precedence]
+order = ["user"]
+lists = "replaced"
+status = "undocumented"
+note = "one shared file for the VS Code extension, the CLI and JetBrains; the pre-migration copy in VS Code's state.vscdb is never deleted and \"file-backed store wins\""
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "json"
+path.any = ["${CLINE_DATA_DIR}/globalState.json", "${CLINE_DIR}/data/globalState.json", "~/.cline/data/globalState.json"]
+[locations.source]
+kind = "source-code"
+url = "https://github.com/cline/cline/blob/01b8a9724da905423e636396d7fb4acdf47796bb/apps/vscode/src/shared/storage/storage-context.ts"
+read_on = 2026-10-16
+quote = "File layout (under the resolved data directory, ~/.cline/data by default): <dataDir>/globalState.json — global state"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "json"
+path.any = ["${CLINE_GLOBAL_SETTINGS_PATH}", "~/.cline/data/settings/global-settings.json"]
+[locations.source]
+kind = "documentation"
+url = "https://docs.cline.bot/cline-cli/configuration"
+read_on = 2026-10-16
+quote = "~/.cline/data/settings/global-settings.json: global settings"
+
+[[settings]]
+key = "autoApprovalSettings.actions.executeSafeCommands"
+kind = "mode"
+file = "globalState.json"
+[settings.states."true"]
+commands = "auto"
+_note = "the only shell toggle in current builds: no safe/all distinction, no allow or deny list"
+[settings.states."false"]
+commands = "asks"
+[settings.source]
+kind = "source-code"
+url = "https://github.com/cline/cline/blob/01b8a9724da905423e636396d7fb4acdf47796bb/apps/vscode/src/sdk/sdk-tool-policies.ts"
+read_on = 2026-10-16
+quote = "run_commands / execute_command → executeSafeCommands"
+
+[[settings]]
+key = "autoApprovalSettings.actions.editFiles"
+kind = "mode"
+file = "globalState.json"
+[settings.states."true"]
+files = "auto"
+[settings.states."false"]
+files = "asks"
+[settings.source]
+kind = "source-code"
+url = "https://github.com/cline/cline/blob/01b8a9724da905423e636396d7fb4acdf47796bb/apps/vscode/src/sdk/sdk-tool-policies.ts"
+read_on = 2026-10-16
+quote = "edit tools (editor, replace_in_file, write_to_file, apply_patch, delete_file) → editFiles"
+
+[[settings]]
+key = "autoApprovalSettings.actions.useBrowser"
+kind = "mode"
+file = "globalState.json"
+[settings.states."true"]
+network = "auto"
+[settings.states."false"]
+network = "asks"
+[settings.source]
+kind = "source-code"
+url = "https://github.com/cline/cline/blob/01b8a9724da905423e636396d7fb4acdf47796bb/apps/vscode/src/sdk/sdk-tool-policies.ts"
+read_on = 2026-10-16
+quote = "fetch_web_content / web_fetch / web_search → useBrowser"
+
+[[settings]]
+key = "autoApprovalSettings.actions.useMcp"
+kind = "mode"
+file = "globalState.json"
+[settings.states."true"]
+mcp = "auto"
+_note = "one global toggle governs all MCP tools; there is no per-tool opt-in"
+[settings.states."false"]
+mcp = "asks"
+[settings.source]
+kind = "source-code"
+url = "https://github.com/cline/cline/blob/01b8a9724da905423e636396d7fb4acdf47796bb/apps/vscode/src/sdk/sdk-tool-policies.ts"
+read_on = 2026-10-16
+quote = "One global toggle governs all MCP tools; there is no per-tool opt-in."
+
+[[settings]]
+key = "yoloModeToggled"
+kind = "mode"
+file = "globalState.json"
+[settings.states."true"]
+all = "auto"
+_note = "legacy YOLO toggle: migrated to every action set to true; current builds no longer read it"
+[settings.source]
+kind = "source-code"
+url = "https://github.com/cline/cline/blob/01b8a9724da905423e636396d7fb4acdf47796bb/apps/vscode/src/hosts/vscode/vscode-to-file-migration.ts"
+read_on = 2026-10-16
+quote = "Version 3 folds the removed \"YOLO mode\" / \"auto-approve all\" toggles into the auto-approval settings: users who ran unattended keep running unattended."
+
+[[settings]]
+key = "toolAutoApprove"
+kind = "mode"
+file = "global-settings.json"
+guard = "CLI auto-approve setting"
+[settings.states."true"]
+_note = "Cline CLI runs: tool auto-approval for all tools (the CLI default); the extension's own toggles above decide for the editor"
+[settings.states."false"]
+_note = "Cline CLI runs: only a fixed read-only set runs automatically; the extension's own toggles above decide for the editor"
+[settings.source]
+kind = "documentation"
+url = "https://docs.cline.bot/cline-cli/cli-reference"
+read_on = 2026-10-16
+quote = "--auto-approve <boolean>: Set tool auto-approval for all tools (default: true)"

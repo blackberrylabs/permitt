@@ -1,0 +1,41 @@
+# Hosts Permitt does not read yet, each with the reason. Not a judgement on the host.
+
+id = "_not-read"
+name = "Not read"
+kind = "list"
+status = "out-of-scope"
+
+[[hosts]]
+id = "roo-code"
+name = "Roo Code"
+reason = "every auto-approval toggle (autoApprovalEnabled, alwaysAllowExecute, alwaysAllowWrite, alwaysAllowMcp…) lives only in VS Code's state database (state.vscdb, SQLite); only the command allow/deny lists are mirrored to settings.json, and alone they decide nothing (D7)"
+
+[[hosts]]
+id = "kilo-code"
+name = "Kilo Code"
+reason = "rebuilt in 2026; settings location and permission model not yet established from documentation"
+
+[[hosts]]
+id = "antigravity-cli"
+name = "Antigravity CLI"
+reason = "replaced Gemini CLI for unpaid and Google One accounts on 2026-06-18; its settings files and permission keys are not yet established"
+
+[[hosts]]
+id = "jetbrains-ai"
+name = "JetBrains AI Assistant / Junie"
+reason = "settings stored in the IDE's XML options; permission model not yet established from documentation"
+
+[[hosts]]
+id = "warp"
+name = "Warp"
+reason = "agent permissions managed in the application's own settings, not in a documented file"
+
+[[hosts]]
+id = "trae"
+name = "Trae"
+reason = "no documented settings file for agent permissions"
+
+[[hosts]]
+id = "factory-droid"
+name = "Factory Droid"
+reason = "only the --skip-permissions-unsafe and --auto flags are documented so far; settings file not yet established (flags are matched in shell files)"

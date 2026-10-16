@@ -1,0 +1,12 @@
+{
+  // Zed
+  "agent": {
+    "tool_permissions": {
+      "default": "allow",
+      "tools": {
+        "terminal": {"default": "confirm", "always_allow": [{"pattern": "^git "}, {"pattern": "^cargo "}]},
+        "fetch": {"default": "deny"}
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "tools": {
+    "approvalMode": "yolo"
+  },
+  "permissions": {
+    "deny": [
+      "Bash(rm *)"
+    ],
+    "allow": [
+      "WebFetch(api.example.com)"
+    ]
+  }
+}

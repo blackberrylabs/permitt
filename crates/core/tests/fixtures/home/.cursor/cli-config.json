@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(git)",
+      "Write(src/**)"
+    ],
+    "deny": [
+      "Shell(curl:*)"
+    ]
+  },
+  "sandbox": {
+    "mode": "enabled"
+  }
+}

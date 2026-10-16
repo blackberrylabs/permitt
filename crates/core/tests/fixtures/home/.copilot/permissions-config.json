@@ -1,0 +1,19 @@
+{
+  "locations": {
+    "__HOME__/proj": {
+      "tool_approvals": [
+        {
+          "kind": "commands",
+          "commandIdentifiers": [
+            "git",
+            "cargo:*"
+          ]
+        },
+        {
+          "kind": "write"
+        }
+      ],
+      "allowed_directories": []
+    }
+  }
+}

@@ -1,0 +1,270 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "claude-code"
+name = "Claude Code"
+vendor = "Anthropic"
+kind = "cli"
+status = "active"
+binaries = ["claude"]
+
+# D9 — what applies when nothing changed it. Since v2.1.283 interactive sessions start in
+# `auto`: a classifier decides. `claude -p` and the SDK start in `default` (asks).
+[defaults]
+commands = "judged"
+files = "judged"
+network = "judged"
+mcp = "judged"
+note = "interactive sessions start in `auto` since v2.1.283; `claude -p` starts in `default`, which asks for everything but reads"
+[defaults.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/permission-modes"
+read_on = 2026-10-16
+quote = "With Claude Code v2.1.283 or later, auto mode is the built-in starting permission mode for interactive terminal and VS Code sessions"
+
+[precedence]
+order = ["managed", "local", "project", "user"]
+lists = "merged"
+status = "documented"
+note = "deny, then ask, then allow; a deny at any level cannot be overridden; `--settings` and `--permission-mode` on the command line sit between managed and local"
+[precedence.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/settings"
+read_on = 2026-10-16
+quote = "In order, highest precedence first: 1. Managed settings … 3. Project local settings (.claude/settings.local.json) 4. Shared project settings (.claude/settings.json) 5. User settings (~/.claude/settings.json)"
+
+# ---- files -------------------------------------------------------------------------------
+
+[[locations]]
+scope = "system"
+level = "managed"
+format = "json"
+path.linux = ["/etc/claude-code/managed-settings.json", "/etc/claude-code/managed-settings.d/*.json"]
+path.macos = ["/Library/Application Support/ClaudeCode/managed-settings.json", "/Library/Application Support/ClaudeCode/managed-settings.d/*.json"]
+path.windows = "C:/Program Files/ClaudeCode/managed-settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/managed-settings"
+read_on = 2026-10-16
+quote = "Linux and WSL: /etc/claude-code/managed-settings.json"
+note = "MDM (plist, registry) and server-delivered managed settings are not on disk in a documented place: an organisation policy may apply that Permitt cannot read"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "json"
+path.any = "~/.claude/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/settings"
+read_on = 2026-10-16
+quote = "User | ~/.claude/settings.json | You, in every project"
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "json"
+path.any = ".claude/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/settings"
+read_on = 2026-10-16
+quote = "Shared project | .claude/settings.json | Everyone working in the folder that contains it. In a git repository, commit it so teammates get it"
+
+[[locations]]
+scope = "project"
+level = "local"
+format = "json"
+path.any = ".claude/settings.local.json"
+[locations.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/settings"
+read_on = 2026-10-16
+quote = "Project local | .claude/settings.local.json | You, in this one project only. Claude Code keeps it out of git when it creates the file"
+
+# ---- settings ----------------------------------------------------------------------------
+
+[[settings]]
+key = "permissions.defaultMode"
+kind = "mode"
+not_honoured_in = ["project", "local"]
+not_honoured_values = ["auto", "bypassPermissions"]
+[settings.states.default]
+all = "asks"
+_note = "Manual: reads only run without asking"
+[settings.states.manual]
+all = "asks"
+[settings.states.acceptEdits]
+commands = "allowlist"
+files = "auto"
+network = "asks"
+mcp = "asks"
+_note = "file edits and common filesystem commands (mkdir, touch, mv, cp…) run without asking"
+[settings.states.plan]
+all = "off"
+_note = "read-only mode"
+[settings.states.auto]
+all = "judged"
+_note = "everything, with background safety checks by a classifier; ignored in .claude/settings.json and .claude/settings.local.json"
+[settings.states.dontAsk]
+all = "off"
+_note = "anything that would prompt is denied"
+[settings.states.bypassPermissions]
+all = "auto"
+_note = "everything; ignored in .claude/settings.json and .claude/settings.local.json"
+[settings.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/permission-modes"
+read_on = 2026-10-16
+quote = "default: Reads only · acceptEdits: Reads, file edits, and common filesystem commands · plan: Reads · auto: Everything, with background safety checks · dontAsk: File reads inside your working directories and pre-approved tools; anything that would prompt is denied · bypassPermissions: Everything"
+note = "If you set \"auto\" in .claude/settings.json or .claude/settings.local.json, the value doesn't take effect … If you set \"bypassPermissions\" in those two files, it doesn't take effect either"
+
+[[settings]]
+key = "permissions.allow"
+kind = "rules"
+effect = "allow"
+[settings.tool_map]
+Bash = "commands"
+Edit = "files"
+Write = "files"
+MultiEdit = "files"
+NotebookEdit = "files"
+WebFetch = "network"
+WebSearch = "network"
+"mcp__*" = "mcp"
+Read = "ignore"
+Glob = "ignore"
+Grep = "ignore"
+LS = "ignore"
+Agent = "ignore"
+Task = "ignore"
+Skill = "ignore"
+TodoWrite = "ignore"
+[settings.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/permissions"
+read_on = 2026-10-16
+quote = "Allow rules let Claude Code use the specified tool without manual approval."
+note = "Bash(*) is equivalent to Bash; an unanchored allow glob such as \"*\" or \"mcp__*\" is skipped with a warning; approvals saved from prompts land here in .claude/settings.local.json"
+
+[[settings]]
+key = "permissions.ask"
+kind = "rules"
+effect = "ask"
+[settings.tool_map]
+Bash = "commands"
+Edit = "files"
+Write = "files"
+MultiEdit = "files"
+NotebookEdit = "files"
+WebFetch = "network"
+WebSearch = "network"
+"mcp__*" = "mcp"
+Read = "ignore"
+Glob = "ignore"
+Grep = "ignore"
+LS = "ignore"
+Agent = "ignore"
+Task = "ignore"
+Skill = "ignore"
+TodoWrite = "ignore"
+[settings.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/permissions"
+read_on = 2026-10-16
+quote = "Ask rules prompt for confirmation whenever Claude Code tries to use the specified tool."
+
+[[settings]]
+key = "permissions.deny"
+kind = "rules"
+effect = "deny"
+guard = "deny rules"
+[settings.tool_map]
+Bash = "commands"
+Edit = "files"
+Write = "files"
+MultiEdit = "files"
+NotebookEdit = "files"
+WebFetch = "network"
+WebSearch = "network"
+"mcp__*" = "mcp"
+Read = "ignore"
+Glob = "ignore"
+Grep = "ignore"
+LS = "ignore"
+Agent = "ignore"
+Task = "ignore"
+Skill = "ignore"
+TodoWrite = "ignore"
+[settings.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/permissions"
+read_on = 2026-10-16
+quote = "Deny rules prevent Claude Code from using the specified tool. … Deny rules block in every mode, including bypassPermissions"
+
+[[settings]]
+key = "permissions.disableBypassPermissionsMode"
+kind = "mode"
+applies = []
+guard = "bypassPermissions / auto locked out"
+[settings.states.disable]
+_note = "bypassPermissions and auto cannot be used, from any settings file"
+[settings.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/permissions"
+read_on = 2026-10-16
+quote = "To prevent bypassPermissions or auto mode from being used, set permissions.disableBypassPermissionsMode or permissions.disableAutoMode to \"disable\" in any settings file."
+
+[[settings]]
+key = "hooks.PreToolUse"
+kind = "mode"
+guard = "PreToolUse hooks"
+[settings.states._any]
+_note = "a hook may allow, deny or ask before each tool call; it never bypasses deny or ask rules"
+[settings.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/permissions"
+read_on = 2026-10-16
+quote = "PreToolUse hook decisions don't bypass permission rules. Claude Code evaluates deny and ask rules regardless of what a PreToolUse hook returns"
+
+[[settings]]
+key = "sandbox.enabled"
+kind = "mode"
+guard = "shell sandbox"
+[settings.states."true"]
+commands = "sandboxed"
+_note = "shell commands run in the sandbox without prompts (sandbox.autoAllowBashIfSandboxed defaults to true); file tools, MCP servers and hooks run outside it"
+[settings.states."false"]
+_note = "sandbox off"
+[settings.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/sandboxing"
+read_on = 2026-10-16
+quote = "The sandbox is off by default … The sandbox covers shell commands only. Claude's file tools, MCP servers, and hooks run outside it."
+
+[[settings]]
+key = "enableAllProjectMcpServers"
+kind = "mode"
+[settings.states."true"]
+mcp = "auto"
+_note = "every server in project .mcp.json files is approved without a prompt (server approval, not per-call confirmation)"
+[settings.states."false"]
+_note = "project servers are approved one by one"
+[settings.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/settings-reference"
+read_on = 2026-10-16
+quote = "enableAllProjectMcpServers: Approve every server in project .mcp.json files without a prompt"
+
+[[settings]]
+key = "skipDangerousModePermissionPrompt"
+kind = "mode"
+levels = ["user", "local", "managed"]
+[settings.states."true"]
+_note = "the warning before entering bypassPermissions was accepted once and is not shown again"
+[settings.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/permission-modes"
+read_on = 2026-10-16
+quote = "skipDangerousModePermissionPrompt"
+note = "written true to ~/.claude/settings.json after accepting the bypass warning"

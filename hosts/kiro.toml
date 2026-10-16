@@ -1,0 +1,196 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "kiro"
+name = "Kiro"
+vendor = "Amazon"
+kind = "editor"
+status = "active"
+binaries = ["kiro", "kiro-cli"]
+
+[defaults]
+commands = "allowlist"
+files = "asks"
+network = "asks"
+mcp = "asks"
+note = "without a permissions.yaml: reads under ./**, common git read-only commands and system-info commands (pwd, whoami, uname) run; everything else prompts. The IDE's Autopilot (default) proceeds only with allowed operations."
+[defaults.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/permissions/"
+read_on = 2026-10-16
+quote = "fs_read on ./**, shell for common git read-only commands, shell for system info commands - pwd, whoami, uname … Everything else prompts for approval. Creating a permissions.yaml adds to these defaults; it does not replace them."
+
+[precedence]
+order = ["managed", "project", "user"]
+lists = "merged"
+status = "documented"
+note = "deny-overrides: deny > ask > allow, whatever the scope — the most restrictive effect wins; workspace rules live under ~/.kiro/workspace-roots/<hash>/, outside the repository"
+[precedence.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/permissions/"
+read_on = 2026-10-16
+quote = "Rules are evaluated using a deny-overrides algorithm: deny > ask > allow. There is no precedence between scopes - the most restrictive effect wins regardless of which scope it came from."
+
+[[unknown]]
+capabilities = []
+overrides_state = false
+reason = "workspace-scoped rules are in ~/.kiro/workspace-roots/<hash>/permissions.yaml with an undocumented hash; the IDE settings file holding kiroAgent.agentAutonomy is not named in the documentation"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "yaml"
+path.any = ["${KIRO_HOME}/settings/permissions.yaml", "~/.kiro/settings/permissions.yaml"]
+[locations.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/permissions/"
+read_on = 2026-10-16
+quote = "~/.kiro/settings/permissions.yaml"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "json"
+path.any = ["${KIRO_HOME}/settings/sandbox.json", "~/.kiro/settings/sandbox.json"]
+[locations.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/sandbox/"
+read_on = 2026-10-16
+quote = "~/.kiro/settings/sandbox.json (CLI: $KIRO_HOME/settings/sandbox.json)"
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "json"
+path.any = ".kiro/settings/sandbox.json"
+[locations.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/sandbox/"
+read_on = 2026-10-16
+quote = "<workspace-root>/.kiro/settings/sandbox.json … When the global policy is active, a project file can only tighten it."
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "json"
+path.any = ["${KIRO_HOME}/agents/*.json", "~/.kiro/agents/*.json"]
+[locations.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/custom-agents/configuration-reference/"
+read_on = 2026-10-16
+quote = "~/.kiro/agents/*.json with permissions field"
+note = "an agent's rules are scoped to that agent"
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "json"
+path.any = ".kiro/agents/*.json"
+[locations.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/custom-agents/configuration-reference/"
+read_on = 2026-10-16
+quote = ".kiro/agents/"
+
+[[settings]]
+key = "rules"
+kind = "object-rules"
+tool_field = "capability"
+effect_field = "effect"
+file = "permissions.yaml"
+[settings.tool_map]
+shell = "commands"
+fs_write = "files"
+web_fetch = "network"
+web_search = "network"
+sandbox_network = "network"
+mcp = "mcp"
+all = "all"
+builtin = "all"
+filesystem = "files"
+fs_read = "ignore"
+subagent = "ignore"
+skill = "ignore"
+power = "ignore"
+context = "ignore"
+diagnostics = "ignore"
+[settings.effect_values]
+allow = "allow"
+ask = "ask"
+deny = "deny"
+[settings.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/permissions/"
+read_on = 2026-10-16
+quote = "rules[] with capability, match (globs), optional exclude, effect. Capabilities: fs_read, fs_write, shell, web_fetch, web_search, mcp, subagent, skill, power, context, diagnostics, sandbox_network. … Effects: deny (block always), ask (prompt you), allow (proceed silently)"
+
+[[settings]]
+key = "permissions.rules"
+kind = "object-rules"
+tool_field = "capability"
+effect_field = "effect"
+[settings.tool_map]
+shell = "commands"
+fs_write = "files"
+web_fetch = "network"
+web_search = "network"
+mcp = "mcp"
+all = "all"
+builtin = "all"
+filesystem = "files"
+fs_read = "ignore"
+_default = "ignore"
+[settings.effect_values]
+allow = "allow"
+ask = "ask"
+deny = "deny"
+[settings.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/custom-agents/configuration-reference/"
+read_on = 2026-10-16
+quote = "Agent profile permissions.rules (same syntax, scoped to this agent only)"
+note = "per agent profile"
+
+[[settings]]
+key = "toolsSettings.*.allowedCommands"
+kind = "rules"
+effect = "allow"
+applies = ["commands"]
+[settings.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/cli/2x-reference/"
+read_on = 2026-10-16
+quote = "allowedCommands — Regex patterns for auto-approved shell commands"
+note = "legacy CLI 2.x / IDE 0.x agent field: toolsSettings is deprecated in CLI V3 and IDE 1.0"
+
+[[settings]]
+key = "enabled"
+kind = "mode"
+guard = "command sandbox"
+file = "sandbox.json"
+[settings.states."true"]
+_note = "commands run inside the sandbox; the permission rules still decide what asks"
+[settings.states."false"]
+_note = "sandbox off"
+[settings.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/sandbox/"
+read_on = 2026-10-16
+quote = "sandbox.json: enabled (true/false), networkAccess ∈ DEFAULT_BLOCKED (default) / COMMON_DEPENDENCIES / DEFAULT_ALLOWED"
+
+[[settings]]
+key = "networkAccess"
+kind = "mode"
+file = "sandbox.json"
+[settings.states.DEFAULT_ALLOWED]
+network = "auto"
+_note = "sandboxed commands can reach any host"
+[settings.states.DEFAULT_BLOCKED]
+_note = "sandbox network blocked by default"
+[settings.states.COMMON_DEPENDENCIES]
+_note = "sandbox network limited to common dependency hosts"
+[settings.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/sandbox/"
+read_on = 2026-10-16
+quote = "DEFAULT_ALLOWED: Open. Sandboxed commands can reach any host."

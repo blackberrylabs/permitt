@@ -1,0 +1,7 @@
+{
+  // comments allowed
+  "chat.tools.terminal.autoApprove": {"rm": false, "git": true, "/^npm/": {"approve": true, "matchCommandLine": true}},
+  "chat.tools.edits.autoApprove": {"**/*": true, "**/.env": false},
+  "chat.tools.urls.autoApprove": {"https://docs.rs/*": true},
+  "security.workspace.trust.enabled": true,
+}

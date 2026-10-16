@@ -1,0 +1,374 @@
+# Shell start-up files Permitt reads (D2), and the closed list of flags and variables it
+# looks for. Only a line that matches is kept. Each entry names the documentation it comes from.
+
+files = [
+  "~/.bashrc", "~/.bash_profile", "~/.bash_aliases", "~/.profile",
+  "~/.zshrc", "~/.zprofile", "~/.zshenv",
+  "~/.config/fish/config.fish",
+]
+
+# ---- Claude Code --------------------------------------------------------------------------
+[[flags]]
+host = "claude-code"
+kind = "flag"
+pattern = "--dangerously-skip-permissions"
+effect = "skips every permission prompt (equivalent to --permission-mode bypassPermissions)"
+[flags.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/cli-reference"
+read_on = 2026-10-16
+quote = "Skip permission prompts. Equivalent to --permission-mode bypassPermissions."
+
+[[flags]]
+host = "claude-code"
+kind = "flag"
+pattern = "--allow-dangerously-skip-permissions"
+effect = "adds bypassPermissions to the Shift+Tab mode cycle"
+[flags.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/cli-reference"
+read_on = 2026-10-16
+quote = "Add bypassPermissions to the Shift+Tab mode cycle without starting in it."
+
+[[flags]]
+host = "claude-code"
+kind = "flag"
+pattern = "--permission-mode"
+effect = "starts in the given permission mode (bypassPermissions, auto, acceptEdits, dontAsk…), overriding defaultMode from settings files"
+[flags.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/cli-reference"
+read_on = 2026-10-16
+quote = "Begin in a specified permission mode. … Overrides defaultMode from settings files"
+
+[[flags]]
+host = "claude-code"
+kind = "flag"
+pattern = "--permission-prompts"
+effect = "with `none`, every prompt is denied instead of asked"
+[flags.source]
+kind = "documentation"
+url = "https://code.claude.com/docs/en/cli-reference"
+read_on = 2026-10-16
+quote = "Pass none when nobody can answer, and Claude Code denies them instead."
+
+# ---- Codex CLI ----------------------------------------------------------------------------
+[[flags]]
+host = "codex"
+kind = "flag"
+pattern = "--dangerously-bypass-approvals-and-sandbox"
+effect = "runs every command without approvals or sandboxing"
+[flags.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+read_on = 2026-10-16
+quote = "Run every command without approvals or sandboxing. Only use inside an externally hardened environment."
+
+[[flags]]
+host = "codex"
+kind = "flag"
+pattern = "--yolo"
+effect = "alias of --dangerously-bypass-approvals-and-sandbox (Codex), or of --force (Cursor CLI), or of --allow-all (Copilot CLI), or auto-approve all actions (Gemini CLI, Qwen Code, Cline CLI)"
+[flags.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+read_on = 2026-10-16
+quote = "--dangerously-bypass-approvals-and-sandbox, --yolo: Run every command without approvals or sandboxing."
+
+[[flags]]
+host = "codex"
+kind = "flag"
+pattern = "--ask-for-approval never"
+effect = "anything that would need approval is rejected automatically, never asked"
+[flags.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+read_on = 2026-10-16
+quote = "--ask-for-approval, -a (on-request | never): Control when Codex pauses for human approval before running a command."
+
+[[flags]]
+host = "codex"
+kind = "flag"
+pattern = "-a never"
+effect = "short form of --ask-for-approval never"
+[flags.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+read_on = 2026-10-16
+quote = "--ask-for-approval, -a"
+
+[[flags]]
+host = "codex"
+kind = "flag"
+pattern = "--sandbox danger-full-access"
+effect = "no sandbox: read, edit, run and reach the network without approval"
+[flags.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/agent-approvals-security"
+read_on = 2026-10-16
+quote = "--sandbox danger-full-access … read files, make edits, and run commands with network access without approval."
+
+[[flags]]
+host = "codex"
+kind = "flag"
+pattern = "-s danger-full-access"
+effect = "short form of --sandbox danger-full-access"
+[flags.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/developer-commands?surface=cli"
+read_on = 2026-10-16
+quote = "--sandbox, -s (read-only | workspace-write | danger-full-access)"
+
+# ---- Gemini CLI / Qwen Code ---------------------------------------------------------------
+[[flags]]
+host = "gemini-cli"
+kind = "flag"
+pattern = "--approval-mode yolo"
+effect = "auto-approves every tool call"
+[flags.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "yolo: Automatically approve all tool calls (equivalent to --yolo)"
+
+[[flags]]
+host = "gemini-cli"
+kind = "flag"
+pattern = "--approval-mode=yolo"
+effect = "auto-approves every tool call"
+[flags.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/cli/cli-reference/"
+read_on = 2026-10-16
+quote = "Deprecated. Auto-approve all actions. Use --approval-mode=yolo instead."
+
+[[flags]]
+host = "qwen-code"
+kind = "flag"
+pattern = "--approval-mode yolo"
+effect = "auto-approves every tool call; does not enable a sandbox"
+[flags.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "--yolo does not automatically enable a sandbox. YOLO mode only auto-approves tool calls"
+
+# ---- GitHub Copilot CLI -------------------------------------------------------------------
+[[flags]]
+host = "copilot-cli"
+kind = "flag"
+pattern = "--allow-all"
+effect = "enables all permissions (tools, paths, URLs)"
+[flags.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference"
+read_on = 2026-10-16
+quote = "--allow-all: Enable all permissions (equivalent to --allow-all-tools --allow-all-paths --allow-all-urls)."
+
+[[flags]]
+host = "copilot-cli"
+kind = "flag"
+pattern = "--allow-all-tools"
+effect = "every tool runs automatically without confirmation"
+[flags.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference"
+read_on = 2026-10-16
+quote = "--allow-all-tools: Allow all tools to run automatically without confirmation."
+
+[[flags]]
+host = "copilot-cli"
+kind = "flag"
+pattern = "--allow-all-paths"
+effect = "file access to any path"
+[flags.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference"
+read_on = 2026-10-16
+quote = "--allow-all-paths: Disable file path verification and allow access to any path."
+
+[[flags]]
+host = "copilot-cli"
+kind = "flag"
+pattern = "--allow-all-urls"
+effect = "access to all URLs without confirmation"
+[flags.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference"
+read_on = 2026-10-16
+quote = "--allow-all-urls: Allow access to all URLs without confirmation."
+
+[[flags]]
+host = "copilot-cli"
+kind = "env"
+pattern = "COPILOT_ALLOW_ALL"
+effect = "same as --allow-all-tools"
+[flags.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference"
+read_on = 2026-10-16
+quote = "Required when using the CLI programmatically (env: COPILOT_ALLOW_ALL)."
+
+# ---- Aider --------------------------------------------------------------------------------
+[[flags]]
+host = "aider"
+kind = "flag"
+pattern = "--yes-always"
+effect = "every confirmation answered yes"
+[flags.source]
+kind = "documentation"
+url = "https://aider.chat/docs/config/options.html"
+read_on = 2026-10-16
+quote = "--yes-always: Always say yes to every confirmation"
+
+[[flags]]
+host = "aider"
+kind = "env"
+pattern = "AIDER_YES_ALWAYS"
+effect = "every confirmation answered yes"
+[flags.source]
+kind = "documentation"
+url = "https://aider.chat/docs/config/options.html"
+read_on = 2026-10-16
+quote = "Environment variable: AIDER_YES_ALWAYS"
+
+# ---- Kiro CLI -----------------------------------------------------------------------------
+[[flags]]
+host = "kiro"
+kind = "flag"
+pattern = "--trust-all-tools"
+effect = "auto-approves all tool calls without prompting"
+[flags.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/cli/headless/"
+read_on = 2026-10-16
+quote = "--trust-all-tools: Auto-approve all tool calls without prompting"
+
+[[flags]]
+host = "kiro"
+kind = "flag"
+pattern = "--trust-tools"
+effect = "auto-approves the listed tools"
+[flags.source]
+kind = "documentation"
+url = "https://kiro.dev/docs/cli/headless/"
+read_on = 2026-10-16
+quote = "--trust-tools=<tool-ids>: Non-interactive V3: auto-approve exact internal tool IDs."
+
+# ---- Cursor CLI ---------------------------------------------------------------------------
+[[flags]]
+host = "cursor-cli"
+kind = "flag"
+pattern = "--force"
+effect = "force-allows commands unless explicitly denied"
+[flags.source]
+kind = "documentation"
+url = "https://cursor.com/docs/cli/reference/parameters"
+read_on = 2026-10-16
+quote = "-f, --force: Force allow commands unless explicitly denied"
+
+[[flags]]
+host = "cursor-cli"
+kind = "flag"
+pattern = "--approve-mcps"
+effect = "automatically approves all MCP servers"
+[flags.source]
+kind = "documentation"
+url = "https://cursor.com/docs/cli/reference/parameters"
+read_on = 2026-10-16
+quote = "--approve-mcps: Automatically approve all MCP servers"
+
+# ---- OpenCode -----------------------------------------------------------------------------
+[[flags]]
+host = "opencode"
+kind = "flag"
+pattern = "--auto"
+effect = "auto-approves permissions that are not explicitly denied"
+[flags.source]
+kind = "documentation"
+url = "https://opencode.ai/docs/cli/"
+read_on = 2026-10-16
+quote = "--auto: Auto-approve permissions that are not explicitly denied"
+
+[[flags]]
+host = "opencode"
+kind = "env"
+pattern = "OPENCODE_PERMISSION"
+effect = "inlined JSON permissions config, overriding the files"
+[flags.source]
+kind = "documentation"
+url = "https://opencode.ai/docs/cli/"
+read_on = 2026-10-16
+quote = "OPENCODE_PERMISSION … Inlined json permissions config"
+
+# ---- Cline CLI ----------------------------------------------------------------------------
+[[flags]]
+host = "cline"
+kind = "flag"
+pattern = "--auto-approve true"
+effect = "tool auto-approval for all tools"
+[flags.source]
+kind = "documentation"
+url = "https://docs.cline.bot/cline-cli/cli-reference"
+read_on = 2026-10-16
+quote = "--auto-approve <boolean>: Set tool auto-approval for all tools (default: true)"
+
+# ---- Goose --------------------------------------------------------------------------------
+[[flags]]
+host = "goose"
+kind = "env"
+pattern = "GOOSE_MODE"
+values = ["auto"]
+effect = "automatically approves tool calls"
+[flags.source]
+kind = "documentation"
+url = "https://block.github.io/goose/docs/guides/environment-variables/"
+read_on = 2026-10-16
+quote = "GOOSE_MODE | Controls how goose handles tool execution | \"auto\", \"approve\", \"chat\", \"smart_approve\""
+
+# ---- Amp ----------------------------------------------------------------------------------
+[[flags]]
+host = "amp"
+kind = "flag"
+pattern = "--dangerously-allow-all"
+effect = "bypasses command confirmations (hidden/legacy flag, present in the binary's strings)"
+[flags.source]
+kind = "observed"
+read_on = 2026-10-16
+quote = "amp binary: Rerun with --dangerously-allow-all to bypass, or configure permissions"
+
+# ---- Devin CLI ----------------------------------------------------------------------------
+[[flags]]
+host = "devin-desktop"
+kind = "flag"
+pattern = "--permission-mode bypass"
+effect = "all tool calls auto-approved"
+[flags.source]
+kind = "documentation"
+url = "https://docs.devin.ai/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "Bypass: all tool calls auto-approved"
+
+[[flags]]
+host = "devin-desktop"
+kind = "env"
+pattern = "DEVIN_PERMISSION_MODE"
+values = ["bypass", "autonomous"]
+effect = "starts in the given permission mode"
+[flags.source]
+kind = "documentation"
+url = "https://docs.devin.ai/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "DEVIN_PERMISSION_MODE=<mode>"
+
+# ---- Factory Droid ------------------------------------------------------------------------
+[[flags]]
+host = "factory-droid"
+kind = "flag"
+pattern = "--skip-permissions-unsafe"
+effect = "skips all permission prompts (command blocks still apply)"
+[flags.source]
+kind = "documentation"
+url = "https://docs.factory.com/droid-exec/overview"
+read_on = 2026-10-16
+quote = "Skip all permission prompts (unsafe; command blocks still apply)"

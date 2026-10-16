@@ -1,0 +1,210 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "copilot-cli"
+name = "GitHub Copilot CLI"
+vendor = "GitHub"
+kind = "cli"
+status = "active"
+binaries = ["copilot"]
+
+[defaults]
+commands = "asks"
+files = "asks"
+network = "asks"
+mcp = "asks"
+note = "read-only operations (searching, reading, read-only shell commands) run automatically; anything that modifies the system or reaches a URL asks"
+[defaults.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/how-tos/copilot-cli/allowing-tools"
+read_on = 2026-10-16
+quote = "While read-only operations like searching, reading files, and running read-only shell commands are allowed automatically, tools that can modify your system—such as running destructive shell commands, editing files, or accessing URLs—require your explicit approval before Copilot can use them."
+
+[precedence]
+order = ["local", "project", "user", "managed"]
+lists = "merged"
+status = "documented"
+note = "later overrides earlier: defaults, MDM, user, repository, local, env, flags — except permissions.disableBypassPermissionsMode (an MDM \"disable\" always wins), managed sandbox floors, and deny rules, which always win"
+[precedence.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference"
+read_on = 2026-10-16
+quote = "Settings are applied in this order (later overrides earlier): Built-in defaults; Mobile Device Management (MDM) managed settings; User settings (~/.copilot/settings.json); Repository settings (.github/copilot/settings.json); Local settings (.github/copilot/settings.local.json); Environment variables; Command-line flags"
+
+[[locations]]
+scope = "system"
+level = "managed"
+format = "json"
+path.linux = "/etc/github-copilot/managed-settings.json"
+path.macos = "/Library/Application Support/GitHubCopilot/managed-settings.json"
+path.windows = "%ProgramFiles%/GitHubCopilot/managed-settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference"
+read_on = 2026-10-16
+quote = "Linux /etc/github-copilot/managed-settings.json"
+note = "server-managed settings are re-fetched hourly and cached in an undocumented place"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "json"
+path.any = ["${COPILOT_HOME}/settings.json", "~/.copilot/settings.json"]
+[locations.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference"
+read_on = 2026-10-16
+quote = "By default, this file is located in the ~/.copilot directory … You can change the location of this directory by setting the COPILOT_HOME environment variable"
+
+# Saved approvals, keyed by the project location (Git root).
+[[locations]]
+scope = "project"
+level = "local"
+format = "json"
+path.any = ["${COPILOT_HOME}/permissions-config.json", "~/.copilot/permissions-config.json"]
+project_key = "locations"
+[locations.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference"
+read_on = 2026-10-16
+quote = "permissions-config.json: Stores your saved tool and directory permission decisions, organized by project location."
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "json"
+path.any = ".github/copilot/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference"
+read_on = 2026-10-16
+quote = ".github/copilot/settings.json: Shared repository configuration (committed to the repository)."
+
+[[locations]]
+scope = "project"
+level = "local"
+format = "json"
+path.any = ".github/copilot/settings.local.json"
+[locations.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference"
+read_on = 2026-10-16
+quote = ".github/copilot/settings.local.json: Personal overrides (add this to .gitignore)."
+
+[[settings]]
+key = "permissions.disableBypassPermissionsMode"
+kind = "mode"
+guard = "allow-all flags locked out"
+[settings.states.disable]
+_note = "--allow-all-tools, --allow-all-paths, --allow-all-urls, --allow-all and --yolo are suppressed at startup"
+[settings.states.allow-auto-only]
+_note = "full allow-all stays blocked; /allow-all auto (assisted) remains possible"
+[settings.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference"
+read_on = 2026-10-16
+quote = "permissions.disableBypassPermissionsMode = \"disable\" (suppress all allow-all flags (--allow-all-tools, --allow-all-paths, --allow-all-urls, --allow-all, --yolo) at startup) or \"allow-auto-only\""
+
+[[settings]]
+key = "sandbox.enabled"
+kind = "mode"
+guard = "sandbox"
+[settings.states."true"]
+_note = "shell commands, MCP/LSP servers and built-in file/web tools are restricted to a sandbox; whether this removes prompts is not documented"
+[settings.states."false"]
+_note = "sandbox off (default)"
+[settings.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference"
+read_on = 2026-10-16
+quote = "sandbox.enabled (bool, default false: Restrict shell commands, MCP/LSP servers, and built-in file/web tools to a sandboxed environment with limited file system and network access)"
+
+[[settings]]
+key = "allowedUrls"
+kind = "rules"
+effect = "allow"
+applies = ["network"]
+[settings.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference"
+read_on = 2026-10-16
+quote = "Saved URL rules are stored in settings.json, not in permissions-config.json. … This approval applies across all your sessions"
+
+# Managed-only rule lists.
+[[settings]]
+key = "permissions.allow"
+kind = "rules"
+effect = "allow"
+levels = ["managed"]
+[settings.tool_map]
+shell = "commands"
+write = "files"
+read = "ignore"
+url = "network"
+memory = "ignore"
+_default = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/enterprise-administrators/enterprise-managed-settings"
+read_on = 2026-10-16
+quote = "The permissions.deny, permissions.ask, and permissions.allow keys use deny > ask > allow precedence."
+
+[[settings]]
+key = "permissions.ask"
+kind = "rules"
+effect = "ask"
+levels = ["managed"]
+[settings.tool_map]
+shell = "commands"
+write = "files"
+read = "ignore"
+url = "network"
+memory = "ignore"
+_default = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/enterprise-administrators/enterprise-managed-settings"
+read_on = 2026-10-16
+quote = "A managed ask rule can't be satisfied by bypass mode (also known as allow-all or YOLO mode)"
+
+[[settings]]
+key = "permissions.deny"
+kind = "rules"
+effect = "deny"
+levels = ["managed"]
+guard = "managed deny rules"
+[settings.tool_map]
+shell = "commands"
+write = "files"
+read = "ignore"
+url = "network"
+memory = "ignore"
+_default = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/enterprise-administrators/enterprise-managed-settings"
+read_on = 2026-10-16
+quote = "Deny rules always take precedence over allow rules, even when --allow-all is set"
+
+# Saved approvals per location: allow only.
+[[settings]]
+key = "tool_approvals"
+kind = "object-rules"
+tool_field = "kind"
+effect = "allow"
+file = "permissions-config.json"
+[settings.tool_map]
+commands = "commands"
+write = "files"
+read = "ignore"
+mcp = "mcp"
+mcp-sampling = "ignore"
+memory = "ignore"
+custom-tool = "ignore"
+extension-management = "ignore"
+extension-permission-access = "ignore"
+[settings.source]
+kind = "documentation"
+url = "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference"
+read_on = 2026-10-16
+quote = "locations.<absolute-path>.tool_approvals[] with kind ∈ commands (+commandIdentifiers, literal match, trailing :* = command stem), read, write, mcp (+serverName, toolName or null = all tools) … permissions-config.json doesn't support deny rules, \"ask\" rules, default modes, URL rules"

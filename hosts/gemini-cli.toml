@@ -1,0 +1,202 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "gemini-cli"
+name = "Gemini CLI"
+vendor = "Google"
+kind = "cli"
+status = "active"
+binaries = ["gemini"]
+
+[defaults]
+commands = "asks"
+files = "asks"
+network = "asks"
+mcp = "asks"
+note = "default approval mode prompts for every tool call except reads; replaced by Antigravity CLI for unpaid and Google One accounts since 2026-06-18"
+[defaults.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "general.defaultApprovalMode: 'default' prompts for approval, 'auto_edit' auto-approves edit tools, and 'plan' is read-only mode. YOLO mode (auto-approve all actions) can only be enabled via command line"
+
+[precedence]
+order = ["managed", "project", "user"]
+lists = "replaced"
+status = "documented"
+note = "defaults < system-defaults file < user < project < system settings < environment < command line; the system-defaults file (lowest) is not read in 0.1; policy TOML: the highest priority rule wins, admin over user"
+[precedence.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "Configuration is applied in the following order of precedence (lower numbers are overridden by higher numbers): 1 Default values, 2 System defaults file, 3 User settings file, 4 Project settings file, 5 System settings file, 6 Environment variables, 7 Command-line arguments."
+
+[[locations]]
+scope = "system"
+level = "managed"
+format = "json"
+path.linux = ["${GEMINI_CLI_SYSTEM_SETTINGS_PATH}", "/etc/gemini-cli/settings.json"]
+path.macos = "/Library/Application Support/GeminiCli/settings.json"
+path.windows = "C:/ProgramData/gemini-cli/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "System (overrides): Linux /etc/gemini-cli/settings.json … The path can be overridden using the GEMINI_CLI_SYSTEM_SETTINGS_PATH environment variable."
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "json"
+path.any = "~/.gemini/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "~/.gemini/settings.json, applying to all sessions for the current user."
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "json"
+path.any = ".gemini/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "Project settings override user settings."
+
+[[settings]]
+key = "general.defaultApprovalMode"
+kind = "mode"
+[settings.states.default]
+all = "asks"
+[settings.states.auto_edit]
+files = "auto"
+_note = "edit tools (replace, write_file) run without asking"
+[settings.states.plan]
+all = "off"
+_note = "read-only mode"
+[settings.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "'default' prompts for approval, 'auto_edit' auto-approves edit tools, and 'plan' is read-only mode."
+
+# Legacy flat key still honoured.
+[[settings]]
+key = "autoAccept"
+kind = "mode"
+[settings.states."true"]
+all = "judged"
+_note = "legacy: tool calls considered safe run without a confirmation prompt"
+[settings.states."false"]
+_note = "legacy autoAccept off"
+[settings.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/cli/configuration"
+read_on = 2026-10-16
+quote = "autoAccept … Lets the CLI run tool calls considered safe without a confirmation prompt."
+
+[[settings]]
+key = "tools.allowed"
+kind = "rules"
+effect = "allow"
+[settings.tool_map]
+run_shell_command = "commands"
+write_file = "files"
+replace = "files"
+edit = "files"
+web_fetch = "network"
+google_web_search = "network"
+web_search = "network"
+read_file = "ignore"
+read_many_files = "ignore"
+glob = "ignore"
+grep_search = "ignore"
+search_file_content = "ignore"
+list_directory = "ignore"
+save_memory = "ignore"
+_default = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "tools.allowed: Tool names that bypass the confirmation dialog. Useful for trusted commands (for example [\"run_shell_command(git)\", \"run_shell_command(npm test)\"])."
+
+[[settings]]
+key = "coreTools"
+kind = "rules"
+effect = "allow"
+[settings.tool_map]
+run_shell_command = "commands"
+write_file = "files"
+replace = "files"
+edit = "files"
+web_fetch = "network"
+google_web_search = "network"
+_default = "ignore"
+[settings.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/cli/configuration"
+read_on = 2026-10-16
+quote = "coreTools … legacy flat schema"
+note = "legacy; an allowlist of core tools, entries with (command) bypass confirmation like tools.allowed"
+
+[[settings]]
+key = "tools.confirmationRequired"
+kind = "rules"
+effect = "ask"
+[settings.tool_map]
+run_shell_command = "commands"
+write_file = "files"
+replace = "files"
+edit = "files"
+web_fetch = "network"
+google_web_search = "network"
+_default = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "tools.confirmationRequired: Tool names that always require user confirmation. Takes precedence over allowed tools and core tool allowlists."
+
+[[settings]]
+key = "tools.sandbox"
+kind = "mode"
+guard = "sandbox"
+[settings.states."true"]
+_note = "commands run inside a sandbox; approval prompts still apply"
+[settings.states."false"]
+_note = "sandbox off"
+[settings.states._any]
+_note = "sandbox command or profile set; approval prompts still apply"
+[settings.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "tools.sandbox: Legacy full-process sandbox execution environment. Set to a boolean to enable or disable the sandbox, provide a string path to a sandbox profile, or specify an explicit sandbox command"
+
+[[settings]]
+key = "security.disableYoloMode"
+kind = "mode"
+guard = "YOLO mode locked out"
+[settings.states."true"]
+_note = "YOLO mode disabled even if a flag asks for it"
+[settings.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "security.disableYoloMode: Disable YOLO mode, even if enabled by a flag."
+
+[[settings]]
+key = "admin.secureModeEnabled"
+kind = "mode"
+guard = "secure mode"
+[settings.states."true"]
+_note = "YOLO mode and \"Always allow\" options cannot be used"
+[settings.source]
+kind = "documentation"
+url = "https://geminicli.com/docs/reference/configuration/"
+read_on = 2026-10-16
+quote = "admin.secureModeEnabled: If true, disallows YOLO mode and \"Always allow\" options from being used."

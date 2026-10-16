@@ -1,0 +1,131 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "opencode"
+name = "OpenCode"
+vendor = "Anomaly"
+kind = "cli"
+status = "active"
+binaries = ["opencode"]
+
+[defaults]
+commands = "auto"
+files = "auto"
+network = "auto"
+mcp = "auto"
+note = "permissive defaults: most permissions are \"allow\"; only doom_loop and external_directory ask, and *.env files are denied to reads"
+[defaults.source]
+kind = "documentation"
+url = "https://opencode.ai/docs/permissions/"
+read_on = 2026-10-16
+quote = "If you don't specify anything, OpenCode starts from permissive defaults: Most permissions default to \"allow\"."
+
+[precedence]
+order = ["managed", "project", "user"]
+lists = "merged"
+status = "documented"
+note = "configs are merged, later ones win only for conflicting keys; within a key the last matching pattern wins; agent-level permissions override the global block"
+[precedence.source]
+kind = "documentation"
+url = "https://opencode.ai/docs/config/"
+read_on = 2026-10-16
+quote = "Configuration files are merged together, not replaced … Later configs override earlier ones only for conflicting keys."
+
+# ---- files -------------------------------------------------------------------------------
+
+[[locations]]
+scope = "system"
+level = "managed"
+format = "jsonc"
+path.linux = ["/etc/opencode/opencode.json", "/etc/opencode/opencode.jsonc"]
+path.macos = ["/Library/Application Support/opencode/opencode.json", "/Library/Application Support/opencode/opencode.jsonc"]
+path.windows = ["%ProgramData%/opencode/opencode.json", "%ProgramData%/opencode/opencode.jsonc"]
+[locations.source]
+kind = "documentation"
+url = "https://opencode.ai/docs/config/"
+read_on = 2026-10-16
+quote = "Managed: /etc/opencode/ on Linux … Managed settings override everything."
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "jsonc"
+path.any = ["${XDG_CONFIG_HOME}/opencode/opencode.json", "${XDG_CONFIG_HOME}/opencode/opencode.jsonc", "~/.config/opencode/opencode.json", "~/.config/opencode/opencode.jsonc"]
+[locations.source]
+kind = "documentation"
+url = "https://opencode.ai/docs/config/"
+read_on = 2026-10-16
+quote = "Global: ~/.config/opencode/opencode.json or .jsonc"
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "jsonc"
+path.any = ["opencode.json", "opencode.jsonc"]
+[locations.source]
+kind = "documentation"
+url = "https://opencode.ai/docs/config/"
+read_on = 2026-10-16
+quote = "Project: opencode.json(c) in project root (walks up to the nearest Git directory)"
+
+# ---- settings ----------------------------------------------------------------------------
+
+# `permission` is either one word for everything, or an object tool → effect, or
+# tool → { pattern → effect }.
+[[settings]]
+key = "permission"
+kind = "map"
+applies = ["commands", "files", "network", "mcp"]
+[settings.tool_map]
+bash = "commands"
+edit = "files"
+write = "files"
+patch = "files"
+webfetch = "network"
+websearch = "network"
+read = "ignore"
+glob = "ignore"
+grep = "ignore"
+list = "ignore"
+task = "ignore"
+skill = "ignore"
+lsp = "ignore"
+question = "ignore"
+todowrite = "ignore"
+todoread = "ignore"
+doom_loop = "ignore"
+external_directory = "ignore"
+"*" = "all"
+_default = "mcp"
+[settings.effect_values]
+allow = "allow"
+ask = "ask"
+deny = "deny"
+[settings.source]
+kind = "documentation"
+url = "https://opencode.ai/docs/permissions/"
+read_on = 2026-10-16
+quote = "Each key may be a string or a pattern→value map, e.g. \"bash\": { \"*\": \"ask\", \"git *\": \"allow\", \"rm *\": \"deny\" } … Rules are evaluated by pattern match, with the last matching rule winning."
+note = "MCP tools are permission keys named after the tool: any key not in the map is read as an MCP tool"
+
+# Legacy booleans, merged into `permission` since v1.1.1.
+[[settings]]
+key = "tools"
+kind = "map"
+applies = ["commands", "files", "network"]
+[settings.tool_map]
+bash = "commands"
+edit = "files"
+write = "files"
+patch = "files"
+webfetch = "network"
+websearch = "network"
+_default = "ignore"
+[settings.effect_values]
+"true" = "allow"
+"false" = "deny"
+[settings.source]
+kind = "documentation"
+url = "https://opencode.ai/docs/permissions/"
+read_on = 2026-10-16
+quote = "As of v1.1.1, the legacy tools boolean config is deprecated and has been merged into permission."

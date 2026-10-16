@@ -1,0 +1,134 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "goose"
+name = "Goose"
+vendor = "Block"
+kind = "cli"
+status = "active"
+binaries = ["goose"]
+
+[defaults]
+commands = "auto"
+files = "auto"
+network = "auto"
+mcp = "auto"
+note = "GOOSE_MODE defaults to auto: goose can modify files, use extensions and delete files without requiring approval; per-tool permission levels are ignored in auto mode"
+[defaults.source]
+kind = "source-code"
+url = "https://github.com/block/goose/blob/3df2d7b28c49621d3ba1eb0347f3ef1ce42592f2/crates/goose/src/config/base.rs"
+read_on = 2026-10-16
+quote = "Err(ConfigError::NotFound(_)) => Ok(GooseMode::Auto)"
+
+[precedence]
+order = ["user"]
+lists = "replaced"
+status = "documented"
+note = "environment variables > config file > defaults; each session keeps its own mode in sessions.db (SQLite, not read): config.yaml gives the default for new sessions"
+[precedence.source]
+kind = "documentation"
+url = "https://block.github.io/goose/docs/guides/config-file/"
+read_on = 2026-10-16
+quote = "Settings are applied in the following order of precedence: 1. Environment variables (highest priority) 2. Config file settings 3. Default values (lowest priority)"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "yaml"
+path.linux = ["${GOOSE_PATH_ROOT}/config/config.yaml", "~/.config/goose/config.yaml"]
+path.macos = ["~/.config/goose/config.yaml", "~/Library/Application Support/Block/goose/config.yaml"]
+path.windows = "%APPDATA%/Block/goose/config/config.yaml"
+[locations.source]
+kind = "documentation"
+url = "https://block.github.io/goose/docs/guides/config-file/"
+read_on = 2026-10-16
+quote = "macOS/Linux ~/.config/goose/config.yaml; Windows %APPDATA%\\Block\\goose\\config\\config.yaml"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "yaml"
+path.linux = ["${GOOSE_PATH_ROOT}/config/permission.yaml", "~/.config/goose/permission.yaml"]
+path.macos = ["~/.config/goose/permission.yaml", "~/Library/Application Support/Block/goose/permission.yaml"]
+path.windows = "%APPDATA%/Block/goose/config/permission.yaml"
+[locations.source]
+kind = "source-code"
+url = "https://github.com/block/goose/blob/3df2d7b28c49621d3ba1eb0347f3ef1ce42592f2/crates/goose/src/config/permission.rs"
+read_on = 2026-10-16
+quote = "const PERMISSION_FILE: &str = \"permission.yaml\"; PermissionManager::new(Paths::config_dir())"
+
+[[settings]]
+key = "GOOSE_MODE"
+kind = "mode"
+file = "config.yaml"
+[settings.states.auto]
+all = "auto"
+_note = "Automatically approve tool calls"
+[settings.states.approve]
+all = "asks"
+_note = "Ask before every tool call (per-tool levels in permission.yaml apply)"
+[settings.states.smart_approve]
+all = "judged"
+_note = "read-only tools run, write tools ask, the rest is classified by the model"
+[settings.states.chat]
+all = "off"
+_note = "Chat only, no tool calls"
+[settings.source]
+kind = "documentation"
+url = "https://block.github.io/goose/docs/guides/goose-permissions/"
+read_on = 2026-10-16
+quote = "auto: Automatically approve tool calls · approve: Ask before every tool call · smart_approve: Ask only for sensitive tool calls · chat: Chat only, no tool calls"
+
+[[settings]]
+key = "user.always_allow"
+kind = "rules"
+effect = "allow"
+whole_tools = true
+file = "permission.yaml"
+[settings.tool_map]
+"developer__shell" = "commands"
+"developer__text_editor" = "files"
+"fetch__*" = "network"
+"computercontroller__*" = "commands"
+_default = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://block.github.io/goose/docs/guides/managing-tools/tool-permissions/"
+read_on = 2026-10-16
+quote = "Always Allow | Tool runs without requiring approval"
+note = "tool names are <extension>__<tool>; tools of other extensions are counted as MCP tools"
+
+[[settings]]
+key = "user.never_allow"
+kind = "rules"
+effect = "deny"
+whole_tools = true
+file = "permission.yaml"
+guard = "tools never allowed"
+[settings.tool_map]
+"developer__shell" = "commands"
+"developer__text_editor" = "files"
+"fetch__*" = "network"
+"computercontroller__*" = "commands"
+_default = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://block.github.io/goose/docs/guides/managing-tools/tool-permissions/"
+read_on = 2026-10-16
+quote = "Never Allow | Tool cannot be used"
+
+[[settings]]
+key = "extensions.developer.enabled"
+kind = "mode"
+file = "config.yaml"
+[settings.states."false"]
+commands = "off"
+files = "off"
+_note = "the Developer extension (shell, text editor) is disabled"
+[settings.states."true"]
+_note = "the Developer extension (shell, text editor) is active"
+[settings.source]
+kind = "documentation"
+url = "https://block.github.io/goose/docs/guides/config-file/"
+read_on = 2026-10-16
+quote = "extensions.<name>.enabled: Whether the extension is active"

@@ -1,0 +1,14 @@
+{
+  "amp.dangerouslyAllowAll": true,
+  "amp.permissions": [
+    {
+      "tool": "Bash",
+      "action": "ask",
+      "matches": {
+        "cmd": [
+          "git push*"
+        ]
+      }
+    }
+  ]
+}

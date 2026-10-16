@@ -1,0 +1,96 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "cursor-cli"
+name = "Cursor CLI"
+vendor = "Anysphere"
+kind = "cli"
+status = "active"
+binaries = ["cursor-agent", "agent"]
+
+[defaults]
+commands = "asks"
+files = "unknown"
+network = "asks"
+mcp = "asks"
+note = "fetches prompt without an allowlist entry; shell commands prompt unless allowed or forced; whether file writes prompt by default is not documented"
+[defaults.source]
+kind = "documentation"
+url = "https://cursor.com/docs/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "WebFetch(domainOrPattern): Without an allowlist entry, each fetch prompts for approval"
+
+[precedence]
+order = ["project", "user"]
+lists = "merged"
+status = "undocumented"
+note = "deny rules take precedence over allow rules; the precedence between ~/.cursor/cli-config.json and <project>/.cursor/cli.json is not documented"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "json"
+path.any = ["${CURSOR_CONFIG_DIR}/cli-config.json", "${XDG_CONFIG_HOME}/cursor/cli-config.json", "~/.cursor/cli-config.json"]
+[locations.source]
+kind = "documentation"
+url = "https://cursor.com/docs/cli/reference/configuration"
+read_on = 2026-10-16
+quote = "Global | macOS/Linux | ~/.cursor/cli-config.json"
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "json"
+path.any = ".cursor/cli.json"
+[locations.source]
+kind = "documentation"
+url = "https://cursor.com/docs/cli/reference/configuration"
+read_on = 2026-10-16
+quote = "Project | All | <project>/.cursor/cli.json — Only permissions can be configured at the project level."
+
+[[settings]]
+key = "permissions.allow"
+kind = "rules"
+effect = "allow"
+[settings.tool_map]
+Shell = "commands"
+Write = "files"
+WebFetch = "network"
+Mcp = "mcp"
+Read = "ignore"
+[settings.source]
+kind = "documentation"
+url = "https://cursor.com/docs/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "permissions.allow / permissions.deny arrays of tokens Shell(commandBase) (Shell(git), Shell(curl:*)), Read(pathOrGlob), Write(pathOrGlob), WebFetch(domainOrPattern), Mcp(server:tool)"
+
+[[settings]]
+key = "permissions.deny"
+kind = "rules"
+effect = "deny"
+guard = "deny rules"
+[settings.tool_map]
+Shell = "commands"
+Write = "files"
+WebFetch = "network"
+Mcp = "mcp"
+Read = "ignore"
+[settings.source]
+kind = "documentation"
+url = "https://cursor.com/docs/cli/reference/permissions"
+read_on = 2026-10-16
+quote = "Deny rules take precedence over allow rules."
+
+[[settings]]
+key = "sandbox.mode"
+kind = "mode"
+guard = "sandbox"
+[settings.states.enabled]
+commands = "sandboxed"
+[settings.states.disabled]
+_note = "sandbox disabled: allowlist mode"
+[settings.source]
+kind = "documentation"
+url = "https://cursor.com/docs/cli/reference/parameters"
+read_on = 2026-10-16
+quote = "--sandbox <mode>: Set sandbox mode: enabled or disabled"

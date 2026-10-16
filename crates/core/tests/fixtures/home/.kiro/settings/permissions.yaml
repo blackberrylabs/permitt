@@ -1,0 +1,12 @@
+rules:
+  - capability: shell
+    match: ["git *"]
+    effect: allow
+  - capability: fs_write
+    match: ["./**"]
+    effect: allow
+  - capability: mcp
+    effect: allow
+  - capability: web_fetch
+    match: ["*"]
+    effect: deny

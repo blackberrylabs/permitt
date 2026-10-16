@@ -1,0 +1,226 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "vscode"
+name = "Visual Studio Code (Copilot)"
+vendor = "Microsoft"
+kind = "editor"
+status = "active"
+binaries = ["code"]
+
+[defaults]
+commands = "allowlist"
+files = "auto"
+network = "asks"
+mcp = "asks"
+note = "Manual permissions: common read-only commands run automatically and rm/del/curl/wget/chmod… ask (built-in terminal rules); file edits are applied and saved first, then reviewed; URL fetches and MCP tool calls ask"
+[defaults.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/agents/run/approvals"
+read_on = 2026-10-16
+quote = "By default, common read-only commands run automatically, while risky commands such as rm and del require approval. … After the agent edits and saves a file, VS Code marks the edits as pending."
+
+[precedence]
+order = ["managed", "project", "user"]
+lists = "replaced"
+status = "documented"
+note = "later scopes override earlier: default, user, workspace, policy (policy always wins; security-related settings cannot be overridden by the workspace); whether terminal auto-approve rules from user and workspace merge is not documented; a false rule always takes precedence"
+[precedence.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/configure/settings"
+read_on = 2026-10-16
+quote = "later scopes override earlier scopes"
+
+[[unknown]]
+capabilities = ["mcp"]
+reason = "per-tool and per-MCP-server \"Allow in session / workspace / always\" choices live in editor state, not in a documented file (cleared with Chat: Reset Tool Confirmations)"
+
+[[locations]]
+scope = "system"
+level = "managed"
+format = "json"
+path.linux = "/etc/vscode/policy.json"
+[locations.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/enterprise/policies"
+read_on = 2026-10-16
+quote = "Linux: /etc/vscode/policy.json (VS Code ≥ 1.106) … the value overrides the VS Code setting value configured at any level"
+note = "policy names differ from setting names (ChatToolsAutoApprove → chat.tools.global.autoApprove); both spellings are read"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "jsonc"
+path.linux = "~/.config/Code/User/settings.json"
+path.macos = "~/Library/Application Support/Code/User/settings.json"
+path.windows = "%APPDATA%/Code/User/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/configure/settings"
+read_on = 2026-10-16
+quote = "Linux $HOME/.config/Code/User/settings.json"
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "jsonc"
+path.any = ".vscode/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/configure/settings"
+read_on = 2026-10-16
+quote = "located under the .vscode folder in your root folder"
+
+[[settings]]
+key = "chat\\.tools\\.global\\.autoApprove"
+kind = "mode"
+[settings.states."true"]
+all = "auto"
+_note = "\"YOLO mode\": every tool runs without confirmation, in every workspace"
+[settings.states."false"]
+_note = "global auto-approval off"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/copilot/reference/copilot-settings"
+read_on = 2026-10-16
+quote = "chat.tools.global.autoApprove: Automatically approve all tools - this setting disables critical security protections."
+
+[[settings]]
+key = "ChatToolsAutoApprove"
+kind = "mode"
+levels = ["managed"]
+[settings.states."true"]
+all = "auto"
+[settings.states."false"]
+_note = "policy forbids global auto-approval; saved tool approvals are not applied"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/enterprise/manage-ai-settings"
+read_on = 2026-10-16
+quote = "Set ChatToolsAutoApprove to false to prevent developers from enabling global auto-approval."
+
+[[settings]]
+key = "chat\\.permissions\\.default"
+kind = "mode"
+[settings.states.default]
+_note = "Manual permissions for new sessions"
+[settings.states.autoApprove]
+all = "auto"
+_note = "new sessions start in Allow all: every tool call runs without confirmation"
+[settings.states.autopilot]
+all = "auto"
+_note = "Autopilot auto-approves all tools, like Allow all"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/copilot/reference/copilot-settings"
+read_on = 2026-10-16
+quote = "Set the default permission level for new chat sessions. Options: default (Manual permissions), autoApprove (Allow all), autopilot (Autopilot)."
+
+[[settings]]
+key = "chat\\.assistedPermissions\\.enabled"
+kind = "mode"
+[settings.states."true"]
+all = "judged"
+_note = "an LLM judge evaluates each tool call and asks only when it does not approve"
+[settings.states."false"]
+_note = "assisted permissions off"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/copilot/reference/copilot-settings"
+read_on = 2026-10-16
+quote = "An LLM judge evaluates the risk of each tool call and asks for your approval when it does not approve a call."
+
+[[settings]]
+key = "chat\\.tools\\.terminal\\.enableAutoApprove"
+kind = "mode"
+[settings.states."false"]
+commands = "asks"
+_note = "every terminal command requires approval"
+[settings.states."true"]
+_note = "terminal auto-approve rules apply"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/copilot/reference/copilot-settings"
+read_on = 2026-10-16
+quote = "Enable or disable automatic approval of terminal commands."
+
+[[settings]]
+key = "chat\\.tools\\.terminal\\.autoApprove"
+kind = "map"
+applies = ["commands"]
+value_field = "approve"
+[settings.effect_values]
+"true" = "allow"
+"false" = "ask"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/agents/run/approvals"
+read_on = 2026-10-16
+quote = "Commands can be set to true (auto-approve) or false (require approval). Regular expressions can be used by wrapping patterns in / characters. … A false rule requires approval. It does not block the command."
+
+[[settings]]
+key = "chat\\.tools\\.edits\\.autoApprove"
+kind = "map"
+applies = ["files"]
+[settings.effect_values]
+"true" = "allow"
+"false" = "ask"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/copilot/reference/copilot-settings"
+read_on = 2026-10-16
+quote = "Configure which files require approval before edits are applied. Uses glob patterns to match file paths in your workspace."
+
+[[settings]]
+key = "chat\\.tools\\.urls\\.autoApprove"
+kind = "map"
+applies = ["network"]
+value_field = "approveRequest"
+[settings.effect_values]
+"true" = "allow"
+"false" = "ask"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/agents/run/approvals"
+read_on = 2026-10-16
+quote = "Use chat.tools.urls.autoApprove to store exact URLs, glob patterns, or wildcards. Set a pattern to a boolean to control both steps, or use approveRequest and approveResponse to control them separately."
+
+[[settings]]
+key = "chat\\.agent\\.sandbox\\.enabled"
+kind = "mode"
+guard = "agent sandbox"
+[settings.states.on]
+_note = "terminal commands run in the sandbox; approvals still apply (sandboxing is independent of the permission level); network inside the sandbox is open by default"
+[settings.states.off]
+_note = "sandbox off (default)"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/agents/run/agent-sandboxing"
+read_on = 2026-10-16
+quote = "It accepts off or on and defaults to off. … Sandboxing is independent of the permission level."
+
+[[settings]]
+key = "security\\.workspace\\.trust\\.enabled"
+kind = "mode"
+guard = "workspace trust"
+[settings.states."false"]
+_note = "workspace trust disabled: restricted mode never applies"
+[settings.states."true"]
+_note = "restricted mode disables agents and workspace MCP servers in untrusted folders"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/agents/run/security"
+read_on = 2026-10-16
+quote = "Restricted mode disables agents in that workspace."
+
+[[settings]]
+key = "github\\.copilot\\.chat\\.claudeAgent\\.allowDangerouslySkipPermissions"
+kind = "mode"
+[settings.states."true"]
+all = "auto"
+_note = "the Claude harness bypasses all permission checks"
+[settings.source]
+kind = "documentation"
+url = "https://code.visualstudio.com/docs/agents/run/approvals"
+read_on = 2026-10-16
+quote = "bypasses all permission checks. Use it only in an isolated sandbox environment without internet access."

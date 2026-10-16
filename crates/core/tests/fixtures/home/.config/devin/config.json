@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Exec(git *)"
+    ],
+    "deny": [
+      "Fetch(*)"
+    ]
+  }
+}

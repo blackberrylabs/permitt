@@ -1,0 +1,176 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "cursor"
+name = "Cursor"
+vendor = "Anysphere"
+kind = "editor"
+status = "active"
+binaries = ["cursor"]
+
+[defaults]
+commands = "asks"
+files = "auto"
+network = "asks"
+mcp = "asks"
+note = "workspace files are edited without approval (configuration files excepted); terminal commands, fetches and MCP tool calls ask — unless the Run Mode says otherwise (see unknown)"
+[defaults.source]
+kind = "documentation"
+url = "https://cursor.com/docs/agent/security"
+read_on = 2026-10-16
+quote = "By default, terminal commands need your approval. … Agents can modify workspace files without approval, except for configuration files. … After you approve an MCP connection, each tool call still needs individual approval before running."
+
+[precedence]
+order = ["project", "user"]
+lists = "merged"
+status = "documented"
+note = "team admin (dashboard, not on disk) > permissions.json (per-user ∪ per-repo) > IDE settings UI; sandbox.json: per-repo over per-user, deny lists always unioned"
+[precedence.source]
+kind = "documentation"
+url = "https://cursor.com/docs/reference/permissions"
+read_on = 2026-10-16
+quote = "Arrays from ~/.cursor/permissions.json and <workspace>/.cursor/permissions.json are concatenated"
+
+# D10 — the central setting is not in a documented file. Observed on a real machine:
+# it is in Cursor's state database.
+[[unknown]]
+capabilities = ["commands", "network", "mcp"]
+reason = "the Run Mode (Auto-review / Allowlist / Run Everything), the protections and the in-app allowlists are stored in Cursor's state database (state.vscdb, keys yoloEnableRunEverything, yoloCommandAllowlist, yoloCommandDenylist, sandboxPolicy…), not read in 0.1; check Settings › Agents › Approvals & Execution"
+[unknown.source]
+kind = "observed"
+read_on = 2026-10-16
+quote = "strings ~/.config/Cursor/User/globalStorage/state.vscdb: yoloEnableRunEverything, yoloCommandAllowlist, yoloCommandDenylist, yoloDeleteFileDisabled, yoloOutsideWorkspaceDisabled, yoloMcpToolsDisabled, fullAutoRun, autoRun, sandboxPolicy"
+
+# ---- files -------------------------------------------------------------------------------
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "jsonc"
+path.any = "~/.cursor/permissions.json"
+[locations.source]
+kind = "documentation"
+url = "https://cursor.com/docs/reference/permissions"
+read_on = 2026-10-16
+quote = "~/.cursor/permissions.json # per-user (applies everywhere)"
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "jsonc"
+path.any = ".cursor/permissions.json"
+[locations.source]
+kind = "documentation"
+url = "https://cursor.com/docs/reference/permissions"
+read_on = 2026-10-16
+quote = "<workspace>/.cursor/permissions.json # per-repo (applies in this workspace) … Commit the per-repo file so teammates inherit the same rules."
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "jsonc"
+path.any = "~/.cursor/sandbox.json"
+[locations.source]
+kind = "documentation"
+url = "https://cursor.com/docs/reference/sandbox"
+read_on = 2026-10-16
+quote = "~/.cursor/sandbox.json | All workspaces (per-user) | Lower"
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "jsonc"
+path.any = ".cursor/sandbox.json"
+[locations.source]
+kind = "documentation"
+url = "https://cursor.com/docs/reference/sandbox"
+read_on = 2026-10-16
+quote = "<workspace>/.cursor/sandbox.json | Single workspace (per-repo) | Higher"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "jsonc"
+path.linux = "~/.config/Cursor/User/settings.json"
+path.macos = "~/Library/Application Support/Cursor/User/settings.json"
+path.windows = "%APPDATA%/Cursor/User/settings.json"
+[locations.source]
+kind = "observed"
+read_on = 2026-10-16
+quote = "Cursor keeps VS Code's user data layout: ~/.config/Cursor/User/settings.json on Linux"
+note = "read for workspace trust only; Cursor documents no agent permission key in settings.json"
+
+# ---- settings ----------------------------------------------------------------------------
+
+[[settings]]
+key = "terminalAllowlist"
+kind = "rules"
+effect = "allow"
+applies = ["commands"]
+file = "permissions.json"
+[settings.source]
+kind = "documentation"
+url = "https://cursor.com/docs/reference/permissions"
+read_on = 2026-10-16
+quote = "terminalAllowlist … Matching is case-sensitive and uses prefix semantics"
+note = "replaces the in-app terminal allowlist entirely when set"
+
+[[settings]]
+key = "mcpAllowlist"
+kind = "rules"
+effect = "allow"
+applies = ["mcp"]
+file = "permissions.json"
+[settings.source]
+kind = "documentation"
+url = "https://cursor.com/docs/reference/permissions"
+read_on = 2026-10-16
+quote = "mcpAllowlist: MCP tools that can run without approval. When set, overrides the in-app MCP allowlist"
+note = "entries are server:tool; entries without a colon are ignored by Cursor"
+
+[[settings]]
+key = "type"
+kind = "mode"
+guard = "shell sandbox policy"
+file = "sandbox.json"
+[settings.states.workspace_readwrite]
+_note = "sandbox: writes confined to the workspace (default when sandboxing is on)"
+[settings.states.workspace_readonly]
+_note = "sandbox: the workspace is read-only"
+[settings.states.insecure_none]
+_note = "sandbox disabled entirely"
+[settings.source]
+kind = "documentation"
+url = "https://cursor.com/docs/reference/sandbox"
+read_on = 2026-10-16
+quote = "type: workspace_readwrite (default) | workspace_readonly | insecure_none (disables the sandbox entirely)"
+note = "whether commands actually run sandboxed depends on the Run Mode, which is not readable (see unknown)"
+
+[[settings]]
+key = "networkPolicy.default"
+kind = "mode"
+file = "sandbox.json"
+[settings.states.deny]
+_note = "sandbox network: deny by default, allow list applies"
+[settings.states.allow]
+_note = "sandbox network: open by default, deny list applies"
+[settings.source]
+kind = "documentation"
+url = "https://cursor.com/docs/reference/sandbox"
+read_on = 2026-10-16
+quote = "networkPolicy.default (\"deny\" default), networkPolicy.allow, networkPolicy.deny (\"Highest priority; always blocks\")"
+
+[[settings]]
+key = "security\\.workspace\\.trust\\.enabled"
+kind = "mode"
+guard = "workspace trust"
+file = "settings.json"
+[settings.states."true"]
+_note = "workspace trust on (off by default in Cursor)"
+[settings.states."false"]
+_note = "workspace trust off"
+[settings.source]
+kind = "documentation"
+url = "https://cursor.com/docs/agent/security"
+read_on = 2026-10-16
+quote = "Cursor supports workspace trust, but it's disabled by default."

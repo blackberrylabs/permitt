@@ -1,0 +1,108 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "aider"
+name = "Aider"
+vendor = "Aider AI"
+kind = "cli"
+status = "active"
+binaries = ["aider"]
+
+[defaults]
+commands = "asks"
+files = "auto"
+network = "off"
+mcp = "off"
+note = "aider writes the files it edits and commits them (auto-commits on); suggested shell commands ask; lint runs automatically after edits (auto-lint on); no web-fetch tool, no MCP"
+[defaults.source]
+kind = "documentation"
+url = "https://aider.chat/docs/config/options.html"
+read_on = 2026-10-16
+quote = "--auto-commits: Enable/disable auto commit of LLM changes (default: True) … --suggest-shell-commands: Enable/disable suggesting shell commands (default: True) … --yes-always: Always say yes to every confirmation"
+
+[precedence]
+order = ["project", "user"]
+lists = "replaced"
+status = "contradictory"
+note = "the documentation says home, then git root, then cwd, \"Files loaded last will take priority\"; the code (configargparse default_config_files = [cwd, git root, home]) makes the home file win in tests — both files are shown"
+[precedence.source]
+kind = "documentation"
+url = "https://aider.chat/docs/config/aider_conf.html"
+read_on = 2026-10-16
+quote = "If the files above exist, they will be loaded in that order. Files loaded last will take priority."
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "yaml"
+path.any = "~/.aider.conf.yml"
+[locations.source]
+kind = "documentation"
+url = "https://aider.chat/docs/config/aider_conf.html"
+read_on = 2026-10-16
+quote = ".aider.conf.yml … Your home directory. The root of your git repo. The current directory."
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "yaml"
+path.any = ".aider.conf.yml"
+[locations.source]
+kind = "documentation"
+url = "https://aider.chat/docs/config/aider_conf.html"
+read_on = 2026-10-16
+quote = "The root of your git repo."
+
+[[settings]]
+key = "auto-test"
+kind = "mode"
+[settings.states."true"]
+commands = "allowlist"
+_note = "the test command runs automatically after each change"
+[settings.states."false"]
+_note = "auto-test off (default)"
+[settings.source]
+kind = "documentation"
+url = "https://aider.chat/docs/config/options.html"
+read_on = 2026-10-16
+quote = "--auto-test: Enable/disable automatic testing after changes (default: False)"
+
+[[settings]]
+key = "yes-always"
+kind = "mode"
+[settings.states."true"]
+commands = "auto"
+files = "auto"
+_note = "every confirmation answered yes (prompts that require an explicit yes are answered no)"
+[settings.states."false"]
+_note = "confirmations asked"
+[settings.source]
+kind = "documentation"
+url = "https://aider.chat/docs/config/options.html"
+read_on = 2026-10-16
+quote = "--yes-always: Always say yes to every confirmation"
+
+[[settings]]
+key = "auto-lint"
+kind = "mode"
+[settings.states."false"]
+_note = "automatic linting after edits turned off"
+[settings.states."true"]
+_note = "lint runs after each edit (default)"
+[settings.source]
+kind = "documentation"
+url = "https://aider.chat/docs/config/options.html"
+read_on = 2026-10-16
+quote = "--auto-lint: Enable/disable automatic linting after changes (default: True)"
+
+[[settings]]
+key = "dry-run"
+kind = "mode"
+[settings.states."true"]
+files = "off"
+_note = "dry run: files are not modified"
+[settings.source]
+kind = "documentation"
+url = "https://aider.chat/docs/config/options.html"
+read_on = 2026-10-16
+quote = "--dry-run: Perform a dry run without modifying files (default: False)"

@@ -1,0 +1,185 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "codex"
+name = "Codex CLI"
+vendor = "OpenAI"
+kind = "cli"
+status = "active"
+binaries = ["codex"]
+
+[defaults]
+commands = "sandboxed"
+files = "sandboxed"
+network = "off"
+mcp = "unknown"
+note = "in a version-controlled folder Codex starts in Auto (workspace-write + on-request): edits and commands inside the workspace run without asking, in a sandbox; network is off; outside-workspace edits and network commands ask. Non-git folders start read-only. The default approval mode of MCP tools is not documented."
+[defaults.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/agent-approvals-security"
+read_on = 2026-10-16
+quote = "--sandbox workspace-write --ask-for-approval on-request … Codex can read files, make edits, and run commands in the working directory automatically. … Codex asks for approval to edit files outside the workspace or to run commands that require network access."
+
+[precedence]
+order = ["project", "user", "managed"]
+lists = "replaced"
+status = "documented"
+note = "CLI flags > project .codex/config.toml (closest wins, trusted projects only) > profile > user > cloud-managed defaults > /etc/codex/config.toml > built-in; /etc/codex/requirements.toml and MDM constrain what may be chosen"
+[precedence.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/config-file/config-basic"
+read_on = 2026-10-16
+quote = "Codex resolves values in this order (highest precedence first): 1. CLI flags and --config overrides 2. Project config files: .codex/config.toml … 4. User config: ~/.codex/config.toml … 6. System config (if present): /etc/codex/config.toml on Unix 7. Built-in defaults"
+
+[[unknown]]
+capabilities = ["mcp"]
+reason = "the default approval mode of MCP tools (mcp_servers.<id>.default_tools_approval_mode) is not stated in the documentation; destructive-annotated tools always ask"
+
+[[locations]]
+scope = "system"
+level = "managed"
+format = "toml"
+path.linux = ["/etc/codex/config.toml", "/etc/codex/requirements.toml", "/etc/codex/managed_config.toml"]
+path.macos = ["/etc/codex/config.toml", "/etc/codex/requirements.toml", "/etc/codex/managed_config.toml"]
+path.windows = "%ProgramData%/OpenAI/Codex/requirements.toml"
+[locations.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/enterprise/managed-configuration"
+read_on = 2026-10-16
+quote = "System requirements.toml (/etc/codex/requirements.toml on Unix systems, including Linux and macOS, or %ProgramData%\\OpenAI\\Codex\\requirements.toml on Windows)"
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "toml"
+path.any = ["${CODEX_HOME}/config.toml", "~/.codex/config.toml"]
+[locations.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/config-file/config-reference"
+read_on = 2026-10-16
+quote = "User-level configuration lives in ~/.codex/config.toml."
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "toml"
+path.any = ".codex/config.toml"
+[locations.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/config-file/config-reference"
+read_on = 2026-10-16
+quote = "You can also add project-scoped overrides in .codex/config.toml files. Codex loads project-scoped config files only when you trust the project."
+
+[[settings]]
+key = "sandbox_mode"
+kind = "mode"
+[settings.states.read-only]
+commands = "sandboxed"
+files = "off"
+network = "off"
+_note = "read-only sandbox: commands run inside it, no writes, no network"
+[settings.states.workspace-write]
+commands = "sandboxed"
+files = "sandboxed"
+network = "off"
+_note = "writes confined to the workspace; network off unless sandbox_workspace_write.network_access"
+[settings.states.danger-full-access]
+commands = "auto"
+files = "auto"
+network = "auto"
+_note = "no sandbox: read, edit, run and reach the network without approval"
+[settings.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/config-file/config-reference"
+read_on = 2026-10-16
+quote = "sandbox_mode: read-only | workspace-write | danger-full-access — Sandbox policy for filesystem and network access during command execution."
+
+[[settings]]
+key = "sandbox_workspace_write.network_access"
+kind = "mode"
+[settings.states."true"]
+network = "auto"
+_note = "outbound network allowed inside the workspace-write sandbox"
+[settings.states."false"]
+network = "off"
+[settings.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/config-file/config-reference"
+read_on = 2026-10-16
+quote = "network_access: Allow outbound network access inside the workspace-write sandbox … the default workspace-write sandbox mode keeps network access turned off unless you enable it"
+
+[[settings]]
+key = "approval_policy"
+kind = "mode"
+[settings.states.on-request]
+_note = "Codex asks before escalating out of the sandbox"
+[settings.states.never]
+_note = "anything that would need approval is rejected automatically, never asked"
+[settings.states.untrusted]
+_note = "no longer supported by Codex (still found in old configs)"
+[settings.states.on-failure]
+_note = "deprecated: use on-request or never"
+[settings.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/config-file/config-reference"
+read_on = 2026-10-16
+quote = "Controls when Codex pauses for approval before executing commands … untrusted is unsupported, and on-failure is deprecated; use on-request for interactive runs or never for non-interactive runs."
+
+[[settings]]
+key = "approvals_reviewer"
+kind = "mode"
+[settings.states.auto_review]
+all = "judged"
+_note = "a reviewer subagent approves escalations instead of the user"
+[settings.states.user]
+_note = "the user reviews escalations"
+[settings.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/config-file/config-reference"
+read_on = 2026-10-16
+quote = "approvals_reviewer: user | auto_review; Defaults to user; auto_review uses the reviewer subagent."
+
+[[settings]]
+key = "mcp_servers.*.default_tools_approval_mode"
+kind = "mode"
+applies = ["mcp"]
+[settings.states.auto]
+mcp = "auto"
+[settings.states.prompt]
+mcp = "asks"
+[settings.states.writes]
+mcp = "denylist"
+_note = "tools that write ask, others run"
+[settings.states.approve]
+mcp = "asks"
+[settings.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/config-file/config-reference"
+read_on = 2026-10-16
+quote = "mcp_servers.<id>.default_tools_approval_mode: auto | prompt | writes | approve — Default approval behavior for MCP tools on this server unless a per-tool override exists"
+
+[[settings]]
+key = "allowed_sandbox_modes"
+kind = "mode"
+guard = "requirements: allowed sandbox modes"
+file = "requirements.toml"
+[settings.states._any]
+_note = "an organisation restricts which sandbox modes may be chosen"
+[settings.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/enterprise/managed-configuration"
+read_on = 2026-10-16
+quote = "allowed_sandbox_modes: Allowed values for sandbox_mode"
+
+[[settings]]
+key = "allowed_approval_policies"
+kind = "mode"
+guard = "requirements: allowed approval policies"
+file = "requirements.toml"
+[settings.states._any]
+_note = "an organisation restricts which approval policies may be chosen"
+[settings.source]
+kind = "documentation"
+url = "https://learn.chatgpt.com/docs/enterprise/managed-configuration"
+read_on = 2026-10-16
+quote = "allowed_approval_policies: Allowed approval policies, such as on-request, never, and granular"

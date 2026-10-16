@@ -1,0 +1,209 @@
+# Permitt host rule. Read by the inventory, never written. Every claim names its source.
+# Schema: docs/hosts.md.
+
+id = "qwen-code"
+name = "Qwen Code"
+vendor = "Alibaba"
+kind = "cli"
+status = "active"
+binaries = ["qwen"]
+
+# The documentation disagrees with itself on the default approval mode.
+[defaults]
+commands = "unknown"
+files = "unknown"
+network = "unknown"
+mcp = "asks"
+contradictory = true
+note = "the settings reference gives tools.approvalMode a default of `auto` (a classifier decides); the approval-mode page says \"Ask Permissions Mode is the initial mode when you start Qwen Code\""
+[defaults.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "tools.approvalMode … default `auto`" 
+
+[precedence]
+order = ["managed", "project", "user"]
+lists = "merged"
+status = "documented"
+note = "same seven levels as Gemini CLI; permissions.allow is merged across scopes; decision priority deny > ask > allow > mode; the system-defaults file (lowest) is not read in 0.1"
+[precedence.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "Decision priority (highest first): deny > ask > allow > (default/interactive mode) … Merged across all scopes (user + project + system)."
+
+[[locations]]
+scope = "system"
+level = "managed"
+format = "json"
+path.linux = ["${QWEN_CODE_SYSTEM_SETTINGS_PATH}", "/etc/qwen-code/settings.json"]
+path.macos = "/Library/Application Support/QwenCode/settings.json"
+path.windows = "C:/ProgramData/qwen-code/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "System: Linux /etc/qwen-code/settings.json … System settings override user and project settings."
+
+[[locations]]
+scope = "user"
+level = "user"
+format = "json"
+path.any = "~/.qwen/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "User: ~/.qwen/settings.json — Applies to all Qwen Code sessions for the current user."
+
+[[locations]]
+scope = "project"
+level = "project"
+format = "json"
+path.any = ".qwen/settings.json"
+[locations.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "Project settings override user settings."
+
+[[settings]]
+key = "tools.approvalMode"
+kind = "mode"
+[settings.states.plan]
+all = "off"
+[settings.states.default]
+all = "asks"
+[settings.states.auto-edit]
+files = "auto"
+[settings.states.auto]
+commands = "judged"
+files = "judged"
+network = "judged"
+_note = "an LLM classifier evaluates each shell command, network call and out-of-workspace edit; if it is unreachable the action is blocked"
+[settings.states.yolo]
+all = "auto"
+[settings.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "plan (analyze only, do not modify files or execute commands), default (require approval before file edits or shell commands run), auto-edit (automatically approve file edits), auto (LLM classifier auto-approves safe actions, blocks risky ones), yolo (automatically approve all tool calls)"
+
+[[settings]]
+key = "permissions.allow"
+kind = "rules"
+effect = "allow"
+[settings.tool_map]
+Bash = "commands"
+Shell = "commands"
+run_shell_command = "commands"
+Edit = "files"
+edit = "files"
+write_file = "files"
+notebook_edit = "files"
+WebFetch = "network"
+web_fetch = "network"
+Read = "ignore"
+read_file = "ignore"
+"mcp__*" = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "permissions.allow: Rules for auto-approved tool calls (no confirmation needed). Merged across all scopes (user + project + system). This key is PURE auto-approval"
+
+[[settings]]
+key = "permissions.ask"
+kind = "rules"
+effect = "ask"
+[settings.tool_map]
+Bash = "commands"
+Shell = "commands"
+run_shell_command = "commands"
+Edit = "files"
+edit = "files"
+write_file = "files"
+notebook_edit = "files"
+WebFetch = "network"
+web_fetch = "network"
+Read = "ignore"
+read_file = "ignore"
+"mcp__*" = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "permissions.ask: Rules for tool calls that always require user confirmation. Takes priority over allow."
+
+[[settings]]
+key = "permissions.deny"
+kind = "rules"
+effect = "deny"
+guard = "deny rules"
+[settings.tool_map]
+Bash = "commands"
+Shell = "commands"
+run_shell_command = "commands"
+Edit = "files"
+edit = "files"
+write_file = "files"
+notebook_edit = "files"
+WebFetch = "network"
+web_fetch = "network"
+Read = "ignore"
+read_file = "ignore"
+"mcp__*" = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "permissions.deny: Rules for blocked tool calls. Highest priority — overrides both allow and ask."
+
+[[settings]]
+key = "tools.allowed"
+kind = "rules"
+effect = "allow"
+[settings.tool_map]
+run_shell_command = "commands"
+Shell = "commands"
+write_file = "files"
+edit = "files"
+web_fetch = "network"
+_default = "mcp"
+[settings.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "tools.allowed: Deprecated. Use permissions.allow instead. Tool names that bypass the confirmation dialog. Not automatically migrated; the legacy setting remains honoured at startup."
+
+[[settings]]
+key = "tools.sandbox"
+kind = "mode"
+guard = "sandbox"
+[settings.states."true"]
+_note = "commands run inside a sandbox; approval prompts still apply"
+[settings.states."false"]
+_note = "sandbox off (default)"
+[settings.states._any]
+_note = "sandbox command or profile set; approval prompts still apply"
+[settings.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "tools.sandbox: Sandbox execution environment (can be a boolean or a path string). … Sandbox is disabled by default"
+
+[[settings]]
+key = "tools.executionSandbox.filesystem"
+kind = "mode"
+guard = "execution sandbox (Linux)"
+levels = ["user", "managed"]
+[settings.states.read-only]
+_note = "operator-only Linux policy, filesystem read-only; approval and YOLO do not expand it"
+[settings.states.workspace-write]
+_note = "operator-only Linux policy, writes confined to the workspace; approval and YOLO do not expand it"
+[settings.source]
+kind = "documentation"
+url = "https://qwenlm.github.io/qwen-code-docs/en/users/configuration/settings/"
+read_on = 2026-10-16
+quote = "tools.executionSandbox is an operator-only Linux policy with required filesystem: \"read-only\" | \"workspace-write\" and network: \"open\" | \"closed\" … Workspace values are ignored."

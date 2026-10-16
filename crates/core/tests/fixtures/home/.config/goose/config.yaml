@@ -1,0 +1,5 @@
+GOOSE_MODE: approve
+GOOSE_PROVIDER: openai
+extensions:
+  developer:
+    enabled: true
