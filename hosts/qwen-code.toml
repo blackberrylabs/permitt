@@ -6,6 +6,7 @@ name = "Qwen Code"
 vendor = "Alibaba"
 kind = "cli"
 status = "active"
+hints.act = "Set `tools.approvalMode` or `permissions.allow/ask/deny` in ~/.qwen/settings.json, or run /approval-mode <mode> --user"
 binaries = ["qwen"]
 
 # The documentation disagrees with itself on the default approval mode.

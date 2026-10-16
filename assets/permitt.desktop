@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Permitt
+GenericName=AI agent permissions inventory
+GenericName[fr]=Inventaire des permissions des agents IA
+Comment=See what each AI assistant on this machine may do without asking — run commands, edit files, reach the network, call MCP tools — and which setting says so. Reads, never writes.
+Comment[fr]=Voir ce que chaque assistant IA de cette machine peut faire sans demander — commandes, fichiers, réseau, outils MCP — et quel réglage le dit. Lit, n'écrit jamais.
+Exec=permitt-app
+Icon=permitt
+Terminal=false
+Categories=Development;Utility;Security;
+Keywords=permissions;ai agents;claude code;cursor;codex;copilot;yolo;approval;sandbox;
+StartupWMClass=permitt-app

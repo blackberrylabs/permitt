@@ -6,6 +6,7 @@ name = "OpenCode"
 vendor = "Anomaly"
 kind = "cli"
 status = "active"
+hints.act = "Add a `permission` block in ~/.config/opencode/opencode.json, e.g. \"bash\": { \"*\": \"ask\" }, \"edit\": \"ask\", \"webfetch\": \"ask\""
 binaries = ["opencode"]
 
 [defaults]

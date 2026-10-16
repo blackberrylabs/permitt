@@ -6,6 +6,7 @@ name = "Kiro"
 vendor = "Amazon"
 kind = "editor"
 status = "active"
+hints.act = "Add rules in ~/.kiro/settings/permissions.yaml (deny > ask > allow, the most restrictive wins)"
 binaries = ["kiro", "kiro-cli"]
 
 [defaults]

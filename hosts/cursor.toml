@@ -6,6 +6,7 @@ name = "Cursor"
 vendor = "Anysphere"
 kind = "editor"
 status = "active"
+hints.act = "Settings › Agents › Approvals & Execution (Run Mode, protections); allowlists can also go in ~/.cursor/permissions.json"
 binaries = ["cursor"]
 
 [defaults]

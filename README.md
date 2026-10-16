@@ -14,7 +14,9 @@ those files and shows you the state. **It never writes to any of them.**
 other job: it tells you what is there, where it comes from, and what to look at — then you
 act in each host's own settings.
 
-Status: **0.1.0**, in development. Linux. 100 % Rust. MIT.
+Status: **0.1.0**. Linux. 100 % Rust. MIT.
+
+![Permitt — light theme](docs/screenshots/light.png)
 
 ## What it shows
 
@@ -61,6 +63,24 @@ model, the rule schema and what we learnt are in [`docs/hosts.md`](docs/hosts.md
 `permitt hosts` prints the same from the binary. Not read yet, with the reason: Roo Code,
 Kilo Code, Antigravity CLI, JetBrains, Warp, Trae.
 
+## Install
+
+Packages are on the [releases page](https://github.com/blackberrylabs/permitt/releases).
+
+```bash
+# Debian / Ubuntu
+sudo apt install ./permitt_0.1.0-1_amd64.deb
+
+# Fedora
+sudo dnf install ./permitt-0.1.0-1.x86_64.rpm
+
+# Any distribution
+chmod +x Permitt-0.1.0-x86_64.AppImage && ./Permitt-0.1.0-x86_64.AppImage
+```
+
+Each package ships both the desktop app (`permitt-app`) and the command line (`permitt`).
+From source: `cargo build --release` (Rust 1.80+).
+
 ## Command line
 
 ```bash
@@ -75,10 +95,36 @@ permitt --root ~/work/app    # add a project root
 permitt --no-shell           # skip ~/.bashrc and friends
 ```
 
+## Desktop app
+
+Same core, one window: the sheet of hosts × capabilities with coloured states, a scope
+picker (user level, or each project root Claude Code knows), "installed only" /
+"findings only" / "shell files" toggles; click a **cell** and the right panel shows why —
+each setting with its file and line, its value, the documentation sentence the rule was
+built from, and what you could do about it; the findings underneath. English by default,
+French on demand; light and dark.
+
+![Permitt — dark theme](docs/screenshots/dark.png)
+
+## Reading the sheet
+
+- **`(default)`** is the most important word on the sheet: it means nothing in your files
+  changed the built-in behaviour — and for OpenCode, Goose, Amp, Cline or Claude Code the
+  built-in behaviour acts without asking.
+- **`judged`** is neither `asks` nor `auto`: a model filters each call. Whether that is
+  enough is your call; Permitt only says it is happening.
+- **`unknown`** always comes with a reason — usually a setting the host keeps in a state
+  database or a panel rather than a documented file (Cursor's Run Mode, Devin's Turbo
+  mode). The detail says where to look.
+- **A project row** appears only where a project file changes the state; the rest of the
+  sheet is the user level.
+- **A deny list is not a wall**: `denylist(n)` means the agent acts without asking except
+  for n patterns, and a command can usually be spelled another way.
+
 ## How it is built
 
-A Rust workspace: `crates/core` (rules, sheets, shell scan, findings — no UI, no network)
-and `crates/cli`. Host rules in `hosts/*.toml`, embedded in the binary. The rule schema,
+A Rust workspace: `crates/core` (rules, sheets, shell scan, findings — no UI, no network),
+`crates/cli`, `crates/app` (iced). Host rules in `hosts/*.toml`, embedded in the binary. The rule schema,
 path resolution, file readers and secret masking come from
 [`hostrules`](https://github.com/blackberrylabs/hostrules), the crate shared by the
 Blackberrylabs tools. `#![forbid(unsafe_code)]` everywhere. The design brief, plan and

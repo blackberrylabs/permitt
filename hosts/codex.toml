@@ -6,6 +6,7 @@ name = "Codex CLI"
 vendor = "OpenAI"
 kind = "cli"
 status = "active"
+hints.act = "Set `sandbox_mode` and `approval_policy` in ~/.codex/config.toml, or run `codex --sandbox <mode> --ask-for-approval <policy>`"
 binaries = ["codex"]
 
 [defaults]

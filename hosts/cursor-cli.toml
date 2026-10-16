@@ -6,6 +6,7 @@ name = "Cursor CLI"
 vendor = "Anysphere"
 kind = "cli"
 status = "active"
+hints.act = "Add `permissions.allow/deny` rules in ~/.cursor/cli-config.json or <project>/.cursor/cli.json"
 binaries = ["cursor-agent", "agent"]
 
 [defaults]

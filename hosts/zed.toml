@@ -6,6 +6,7 @@ name = "Zed"
 vendor = "Zed Industries"
 kind = "editor"
 status = "active"
+hints.act = "Set `agent.tool_permissions.default` or per-tool rules in ~/.config/zed/settings.json"
 binaries = ["zed", "zeditor"]
 
 [defaults]

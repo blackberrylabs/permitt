@@ -6,6 +6,7 @@ name = "Cline"
 vendor = "Cline Bot Inc."
 kind = "extension"
 status = "active"
+hints.act = "Cline settings › Auto-approve (stored in ~/.cline/data/globalState.json)"
 binaries = ["cline"]
 
 [defaults]

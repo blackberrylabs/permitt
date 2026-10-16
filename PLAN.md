@@ -23,7 +23,12 @@
 ## Etape 2. CLI et passage reel
 - [x] CLI roster | findings | files | shell | hosts — 2026-10-16
 - [x] Passage reel : 4 hotes, OpenCode tout `auto (default)`, Cursor `unknown` (Run Mode), Claude Code `judged`, hook PreToolUse de Nimeria_poa vu ; constats de projet dedoublonnes — 2026-10-16
-- [ ] Commit 1
+- [x] Commit 1 (2ebe97c) — 2026-10-16
 ## Etape 3. Application iced (maquette validee avant le code)
+- [x] Maquette HTML validee (detail par cellule, Scope, ligne de contexte) — 2026-10-16
+- [x] App iced : feuille, detail, constats, EN/FR, clair/sombre ; captures — 2026-10-16
 ## Etape 4. Paquets, depot, release 0.1.0 — sur accord
+- [x] deb / rpm / AppImage construits dans le cloud, SHA256SUMS verifie sur la machine — 2026-10-16
+- [ ] Commit 2 ; test du .deb sur la machine d'Alexandre
+- [ ] Depot public blackberrylabs/permitt, push, tag v0.1.0, release — sur accord
 ## Etape 5. README, captures, textes — decision d'Alexandre

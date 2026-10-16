@@ -6,6 +6,7 @@ name = "Visual Studio Code (Copilot)"
 vendor = "Microsoft"
 kind = "editor"
 status = "active"
+hints.act = "Set `chat.tools.terminal.autoApprove`, `chat.tools.edits.autoApprove`, `chat.tools.urls.autoApprove` or `chat.permissions.default` in settings.json"
 binaries = ["code"]
 
 [defaults]

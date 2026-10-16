@@ -6,6 +6,7 @@ name = "Aider"
 vendor = "Aider AI"
 kind = "cli"
 status = "active"
+hints.act = "Remove `yes-always` from .aider.conf.yml, or run without --yes-always"
 binaries = ["aider"]
 
 [defaults]

@@ -6,6 +6,7 @@ name = "GitHub Copilot CLI"
 vendor = "GitHub"
 kind = "cli"
 status = "active"
+hints.act = "Use /permissions in a session; saved approvals live in ~/.copilot/permissions-config.json; set `permissions.disableBypassPermissionsMode` in ~/.copilot/settings.json to lock out allow-all"
 binaries = ["copilot"]
 
 [defaults]

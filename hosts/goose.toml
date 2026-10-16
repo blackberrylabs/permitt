@@ -6,6 +6,7 @@ name = "Goose"
 vendor = "Block"
 kind = "cli"
 status = "active"
+hints.act = "Set `GOOSE_MODE: approve` (or smart_approve) in ~/.config/goose/config.yaml, or run `goose configure` › Tool Permission"
 binaries = ["goose"]
 
 [defaults]

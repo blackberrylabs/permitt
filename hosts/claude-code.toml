@@ -6,6 +6,7 @@ name = "Claude Code"
 vendor = "Anthropic"
 kind = "cli"
 status = "active"
+hints.act = "Set `permissions.defaultMode` or add `permissions.allow/ask/deny` rules in ~/.claude/settings.json (user) or .claude/settings.json (project)"
 binaries = ["claude"]
 
 # D9 — what applies when nothing changed it. Since v2.1.283 interactive sessions start in

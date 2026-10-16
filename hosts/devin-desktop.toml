@@ -6,6 +6,7 @@ name = "Devin Desktop (Windsurf)"
 vendor = "Cognition"
 kind = "editor"
 status = "active"
+hints.act = "Cascade: Devin Settings panel (auto-execution level); Devin CLI: `permissions` in ~/.config/devin/config.json or .devin/config.json"
 binaries = ["windsurf", "devin"]
 
 # Two agents share the application: Cascade (legacy Windsurf agent) whose auto-execution

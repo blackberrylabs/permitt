@@ -6,6 +6,7 @@ name = "Amp"
 vendor = "Sourcegraph"
 kind = "cli"
 status = "active"
+hints.act = "Add rules to `amp.permissions` in ~/.config/amp/settings.json; remove `amp.dangerouslyAllowAll`"
 binaries = ["amp"]
 
 [defaults]

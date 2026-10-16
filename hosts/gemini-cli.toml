@@ -6,6 +6,7 @@ name = "Gemini CLI"
 vendor = "Google"
 kind = "cli"
 status = "active"
+hints.act = "Set `general.defaultApprovalMode`, `tools.allowed` or `tools.confirmationRequired` in ~/.gemini/settings.json; `security.disableYoloMode` locks YOLO out"
 binaries = ["gemini"]
 
 [defaults]

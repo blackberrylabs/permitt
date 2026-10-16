@@ -3,6 +3,20 @@
 
 ---
 
+## 2026-10-16, nuit — l'application
+
+- Maquette HTML avec les quatre hotes reels, validee d'un mot. Deux choix propres a Permitt :
+  le detail s'ouvre par **cellule** (la question est toujours « pourquoi cette case dit ca »),
+  et une ligne de contexte sous le nom d'hote plutot qu'une colonne de plus.
+- App iced ecrite d'une traite sur le squelette de MCProster ; compile du premier coup,
+  clippy propre. Ajustements vus en capture (Xvfb) : glyphe ⚑ absent de la police → ▲ ;
+  bloc de preuve sur deux lignes (la valeur en monospace se cassait caractere par
+  caractere) ; libelles de filtres plus courts en francais ; marge droite du panneau.
+  `PERMITT_SELECT=hote:capacite` pre-selectionne une cellule pour les captures de doc.
+- Paquets construits, sommes verifiees sur la machine. Reste : le test du .deb et la release.
+
+---
+
 ## 2026-10-16, nuit — le coeur et les seize fiches
 
 - Etape 0 le soir (quatre enquetes, une synthese, une observation sur la machine), D8 a D11,
