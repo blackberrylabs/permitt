@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- The interface building blocks, palette, preferences and translated strings now come from
+  the shared crate [`bbl-ui`](https://github.com/blackberrylabs/bbl-ui), like the other
+  Blackberrylabs tools. Nothing visible changes.
+
 ## [0.1.0] — 2026-10-16
 
 First release.

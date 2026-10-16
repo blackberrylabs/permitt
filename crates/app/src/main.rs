@@ -3,15 +3,12 @@
 //! Reads the same core as the CLI; writes only its settings (BRIEF R8).
 #![forbid(unsafe_code)]
 
-mod i18n;
-mod settings;
-
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use iced::widget::{
     button, checkbox, column, container, horizontal_rule, horizontal_space, mouse_area, pick_list,
-    row, scrollable, text, text_input, Space,
+    row, scrollable, text, text_input,
 };
 use iced::{Background, Border, Color, Element, Length, Task, Theme};
 
@@ -22,8 +19,20 @@ use permitt_core::model::{
 use permitt_core::rules::ShellRules;
 use permitt_core::{inventory, Env, Inventory, Options, Rules};
 
-use i18n::{Lang, Strings};
-use settings::Settings;
+use bbl_ui::palette::{alert, amber, good, muted as unknown, neutral};
+use bbl_ui::widgets::{card, inner, pill, small_button};
+use bbl_ui::{Lang, Prefs, Strings};
+
+const EN: &str = include_str!("../../../locales/en.json");
+const FR: &str = include_str!("../../../locales/fr.json");
+
+/// Permitt's own preference, next to the language and theme `bbl-ui` keeps for every app.
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
+struct Extra {
+    /// `false` to leave `~/.bashrc` and friends unread (BRIEF R4).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    read_shell: Option<bool>,
+}
 
 fn main() -> iced::Result {
     iced::application(App::title, App::update, App::view)
@@ -51,6 +60,7 @@ enum Message {
 }
 
 struct App {
+    prefs: Prefs<Extra>,
     lang: Lang,
     strings: Strings,
     dark: bool,
@@ -72,19 +82,21 @@ struct App {
 
 impl App {
     fn new() -> (App, Task<Message>) {
-        let settings = Settings::load();
-        let lang = settings.initial_lang();
-        let strings = Strings::load(lang);
+        let prefs: Prefs<Extra> = Prefs::load("permitt");
+        let lang = prefs.initial_lang();
+        let dark = prefs.initial_dark();
+        let strings = Strings::load(EN, FR, lang);
         let env = Env::current();
         let rules = Arc::new(permitt_core::rules::embedded());
         let shell_rules = Arc::new(permitt_core::rules::embedded_shell());
-        let read_shell = settings.reads_shell();
+        let read_shell = prefs.extra.read_shell.unwrap_or(true);
         let status = strings.t("header.scanning", &[]);
         let task = load(rules.clone(), shell_rules.clone(), env.clone(), read_shell);
         let app = App {
+            prefs,
             lang,
             strings,
-            dark: settings.initial_dark(),
+            dark,
             env,
             rules,
             shell_rules,
@@ -114,13 +126,10 @@ impl App {
         }
     }
 
-    fn remember(&self) {
-        Settings {
-            lang: Some(self.lang.code().to_string()),
-            theme: Some(if self.dark { "dark" } else { "light" }.to_string()),
-            read_shell: Some(self.read_shell),
-        }
-        .save();
+    fn remember(&mut self) {
+        self.prefs.remember(self.lang, self.dark);
+        self.prefs.extra.read_shell = Some(self.read_shell);
+        self.prefs.save();
     }
 
     fn reload(&mut self) -> Task<Message> {
@@ -178,7 +187,7 @@ impl App {
             Message::Rescan => return self.reload(),
             Message::SetLang(l) => {
                 self.lang = l;
-                self.strings = Strings::load(l);
+                self.strings = Strings::load(EN, FR, l);
                 self.remember();
                 self.refresh_status();
             }
@@ -380,16 +389,13 @@ impl App {
         } else {
             self.strings.t("theme.dark", &[])
         };
-        let footer = row![
-            text(self.status.clone()).size(12).style(text::secondary),
-            horizontal_space(),
-            self.view_lang_picker(),
-            Space::with_width(6),
-            button(text(theme_label).size(12))
-                .style(button::text)
-                .on_press(Message::ToggleTheme),
-        ]
-        .align_y(iced::Alignment::Center);
+        let footer = bbl_ui::widgets::footer(
+            self.status.clone(),
+            self.lang,
+            Message::SetLang,
+            theme_label,
+            Message::ToggleTheme,
+        );
         column![self.view_header(), body, footer]
             .spacing(14)
             .padding(16)
@@ -422,23 +428,23 @@ impl App {
             })
         };
         row![
-            self.kpi(
-                &s.t("kpi.hosts", &[]),
-                &n(installed),
-                &s.t("kpi.hosts_known", &[("n", &known.to_string())]),
+            bbl_ui::widgets::kpi(
+                s.t("kpi.hosts", &[]),
+                n(installed),
+                s.t("kpi.hosts_known", &[("n", &known.to_string())]),
                 None
             ),
-            self.kpi(
-                &s.t("kpi.auto", &[]),
-                &n(auto),
-                &s.t("kpi.auto_sub", &[("n", &total.to_string())]),
+            bbl_ui::widgets::kpi(
+                s.t("kpi.auto", &[]),
+                n(auto),
+                s.t("kpi.auto_sub", &[("n", &total.to_string())]),
                 dot(auto)
             ),
-            self.kpi(&s.t("kpi.findings", &[]), &n(findings), "", dot(findings)),
-            self.kpi(
-                &s.t("kpi.shell", &[]),
-                &n(shell),
-                &s.t(
+            bbl_ui::widgets::kpi(s.t("kpi.findings", &[]), n(findings), "", dot(findings)),
+            bbl_ui::widgets::kpi(
+                s.t("kpi.shell", &[]),
+                n(shell),
+                s.t(
                     "kpi.shell_sub",
                     &[(
                         "n",
@@ -450,48 +456,6 @@ impl App {
         ]
         .spacing(12)
         .into()
-    }
-
-    fn kpi<'a>(
-        &self,
-        label: &str,
-        value: &str,
-        sub: &str,
-        dot: Option<Color>,
-    ) -> Element<'a, Message> {
-        let mut head = row![].spacing(6).align_y(iced::Alignment::Center);
-        if let Some(c) = dot {
-            head = head.push(swatch(c, 8));
-        }
-        head = head.push(text(label.to_string()).size(12).style(text::secondary));
-        card(
-            column![
-                head,
-                text(value.to_string()).size(28),
-                text(sub.to_string()).size(11).style(text::secondary),
-            ]
-            .spacing(2)
-            .into(),
-        )
-        .width(Length::Fill)
-        .into()
-    }
-
-    fn view_lang_picker(&self) -> Element<'_, Message> {
-        let pick = |lang: Lang, label: &'static str| -> Element<'_, Message> {
-            let b = button(text(label).size(11)).padding([2, 7]);
-            if lang == self.lang {
-                b.style(button::primary).into()
-            } else {
-                b.style(button::text)
-                    .on_press(Message::SetLang(lang))
-                    .into()
-            }
-        };
-        row![pick(Lang::En, "EN"), pick(Lang::Fr, "FR")]
-            .spacing(2)
-            .align_y(iced::Alignment::Center)
-            .into()
     }
 
     fn view_filters(&self) -> Element<'_, Message> {
@@ -993,122 +957,6 @@ fn finding_where(f: &Finding, home: &Path, s: &Strings) -> Option<String> {
         ));
     }
     f.message.split(" — ").nth(1).map(String::from)
-}
-
-/// Cleanator's palette: green for "fine", orange for "look at this", grey for information;
-/// amber for the third regime, where a model decides.
-fn hex(rgb: u32) -> Color {
-    Color::from_rgb8(
-        ((rgb >> 16) & 0xff) as u8,
-        ((rgb >> 8) & 0xff) as u8,
-        (rgb & 0xff) as u8,
-    )
-}
-
-fn good(dark: bool) -> Color {
-    if dark {
-        hex(0x2fa32f)
-    } else {
-        hex(0x008300)
-    }
-}
-
-fn alert(dark: bool) -> Color {
-    if dark {
-        hex(0xd95926)
-    } else {
-        hex(0xeb6834)
-    }
-}
-
-fn amber(dark: bool) -> Color {
-    if dark {
-        hex(0xd49a1a)
-    } else {
-        hex(0xb98400)
-    }
-}
-
-fn neutral() -> Color {
-    hex(0x7a869a)
-}
-
-fn unknown() -> Color {
-    hex(0x9aa3b2)
-}
-
-fn card<'a>(content: Element<'a, Message>) -> container::Container<'a, Message> {
-    container(content).padding(14).style(|theme: &Theme| {
-        let p = theme.extended_palette();
-        container::Style {
-            background: Some(Background::Color(p.background.weak.color)),
-            border: Border {
-                radius: 10.0.into(),
-                width: 1.0,
-                color: p.background.strong.color,
-            },
-            ..Default::default()
-        }
-    })
-}
-
-/// A detail block inside a card: the page background, rounded, like Cleanator's details.
-fn inner<'a>(content: Element<'a, Message>) -> Element<'a, Message> {
-    container(content)
-        .padding(iced::Padding {
-            top: 6.0,
-            right: 10.0,
-            bottom: 6.0,
-            left: 10.0,
-        })
-        .width(Length::Fill)
-        .style(|theme: &Theme| {
-            let p = theme.extended_palette();
-            container::Style {
-                background: Some(Background::Color(p.background.base.color)),
-                border: Border {
-                    radius: 6.0.into(),
-                    ..Default::default()
-                },
-                ..Default::default()
-            }
-        })
-        .into()
-}
-
-fn swatch<'a>(color: Color, size: u16) -> Element<'a, Message> {
-    container(Space::new(size, size))
-        .style(move |_: &Theme| container::Style {
-            background: Some(Background::Color(color)),
-            border: Border {
-                radius: (size as f32 / 3.0).into(),
-                ..Default::default()
-            },
-            ..Default::default()
-        })
-        .into()
-}
-
-fn pill<'a>(label: String, color: Color) -> Element<'a, Message> {
-    container(text(label).size(11).color(Color::WHITE))
-        .padding([2, 8])
-        .style(move |_: &Theme| container::Style {
-            background: Some(Background::Color(color)),
-            border: Border {
-                radius: 8.0.into(),
-                ..Default::default()
-            },
-            ..Default::default()
-        })
-        .into()
-}
-
-fn small_button(label: String, msg: Message) -> Element<'static, Message> {
-    button(text(label).size(11))
-        .padding([2, 7])
-        .style(button::secondary)
-        .on_press(msg)
-        .into()
 }
 
 fn load(rules: Arc<Rules>, shell: Arc<ShellRules>, env: Env, read_shell: bool) -> Task<Message> {

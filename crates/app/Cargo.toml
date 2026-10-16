@@ -15,6 +15,7 @@ path = "src/main.rs"
 permitt-core = { path = "../core" }
 hostrules.workspace = true
 iced = { version = "=0.13.1", features = ["tokio"] }
+bbl-ui = { git = "https://github.com/blackberrylabs/bbl-ui", tag = "v0.1.0" }
 serde.workspace = true
 serde_json.workspace = true
 
