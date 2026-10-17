@@ -3,6 +3,16 @@
 
 ---
 
+## 2026-10-17 — 0.2.0 publiee
+
+- Premiere release de la serie « modules de la tour » (ordre decide par Alexandre : Permitt
+  0.2.0, MCProster 0.2.1, Cleanator 0.2.0, puis Blackberrylabs 0.1.0). `gh` installe sur sa
+  machine a cette occasion (`gh auth login`, cle SSH deja en place).
+- Verifiee depuis le cloud : `.deb` telecharge, somme OK, `permitt --version` 0.2.0,
+  `permitt report` repond un `bbl-report/1` conforme.
+
+---
+
 ## 2026-10-16, tard — le rapport pour la tour
 
 - La tour de controle Blackberrylabs est cadree (BRIEF valide) et son contrat publie :

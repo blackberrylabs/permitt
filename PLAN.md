@@ -38,7 +38,7 @@
 ## Vers 0.2 — module de la tour de controle
 - [x] `permitt report` (`bbl-report/1`), `--select` dans l'app, mapping des gravites dans le CHANGELOG — 2026-10-16
 - [x] Coeur `bbl-hostrules` 0.3.0 (renommage) — 2026-10-16
-- [ ] Release 0.2.0 — accord donne le 2026-10-17 (« Go, tel quel ») : commit 6, build.sh, push, tag, release
+- [x] Release 0.2.0 publiee (commit 5bd84c3, tag v0.2.0, trois paquets + SHA256SUMS), verifiee depuis le cloud : somme OK, `permitt report` repond bbl-report/1 — 2026-10-17
 
 ## Apres 0.1.0 (idees, non engagees)
 - Lecture SQLite `mode=ro` de `state.vscdb` pour le Run Mode de Cursor (cles `yolo*` observees) et Roo Code (D7 → 0.2)

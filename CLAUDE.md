@@ -26,8 +26,18 @@ Avant le **premier commit** : `git config user.name "Alexandre Do"` et
 `git config user.email "277202463+Nimeria2026@users.noreply.github.com"` en config locale ;
 verifier par `git log --format='%an <%ae>'` avant tout push.
 
-## Fondation commune
+## Fondations communes — ne pas recopier, completer a la source
 
-Le coeur (regles d'hotes, env, lecteurs, masquage) vient de la crate `hostrules`
-(`Logiciels/Hostrules`, depot `blackberrylabs/hostrules`). Ne pas le recopier ici ; ce qui
-manque a `hostrules` s'ajoute dans `hostrules`.
+- `bbl-hostrules` (`Logiciels/Bbl_hostrules`, depot `blackberrylabs/bbl-hostrules`, ex-`hostrules`) :
+  regles d'hotes, env, lecteurs, masquage. Ce qui manque s'ajoute la-bas.
+- `bbl-ui` (`Logiciels/Bbl_ui`) : palette, briques iced, reglages, i18n — meme visage partout.
+- `bbl-report` (`Logiciels/Bbl_report`) : le contrat de la tour. `permitt report` produit un
+  `bbl-report/1` (`crates/core/src/report.rs`) ; le mapping des constats sur les quatre
+  gravites est dans `severity_of` et dans le CHANGELOG — toute nouvelle `FindingKind` y passe.
+  `permitt-app --select host[:capability]` ouvre l'app ou la tour le demande.
+
+## Tour de controle
+
+Permitt est un module de Blackberrylabs (`Logiciels/Blackberrylabs`) ; la marche a suivre
+d'un module est `docs/new-module.md` dans la tour. Publier le module avant la tour quand le
+contrat bouge. Avant tout git lance par Alexandre : `find .git -name '*.lock' -delete`.

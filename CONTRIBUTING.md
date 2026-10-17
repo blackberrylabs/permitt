@@ -21,6 +21,13 @@ table in `docs/hosts.md` is kept in step with the rules by hand.
 The bypass flags Permitt looks for in shell files are the closed list in
 `hosts/_shell.toml`; a new flag needs the documentation sentence that describes it.
 
+## Adding a kind of finding
+
+A new `FindingKind` needs its label, its rank (`severity` in `model.rs`), and its place on
+the four common severities of the Blackberrylabs tower (`severity_of` in
+`crates/core/src/report.rs`) — act now, review, good to know, information — written in the
+CHANGELOG. The tower never reinterprets.
+
 ## What will not be merged
 
 - Anything that writes to, moves or deletes a host's configuration file, even with a

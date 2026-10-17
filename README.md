@@ -14,7 +14,7 @@ those files and shows you the state. **It never writes to any of them.**
 other job: it tells you what is there, where it comes from, and what to look at — then you
 act in each host's own settings.
 
-Status: **0.1.0**. Linux. 100 % Rust. MIT.
+Status: **0.2.0**. Linux. 100 % Rust. MIT.
 
 ![Permitt — light theme](docs/screenshots/light.png)
 
@@ -121,6 +121,13 @@ French on demand; light and dark.
   sheet is the user level.
 - **A deny list is not a wall**: `denylist(n)` means the agent acts without asking except
   for n patterns, and a command can usually be spelled another way.
+
+## Part of Blackberrylabs
+
+Permitt is a module of the [Blackberrylabs](https://github.com/blackberrylabs) control
+tower, which gathers what Permitt, MCProster and Cleanator find on a machine in one list, most serious
+first. `permitt report` is what the tower reads; `permitt-app --select` is how it opens Permitt
+at a finding. Each tool stays complete and installable on its own.
 
 ## How it is built
 
