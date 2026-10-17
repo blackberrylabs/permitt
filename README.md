@@ -124,11 +124,12 @@ French on demand; light and dark.
 
 ## Part of Blackberrylabs
 
-Permitt is a module of the [Blackberrylabs](https://github.com/blackberrylabs) control
-tower, which gathers what Permitt, MCProster and Cleanator find on a machine in one list, most serious
-first. `permitt report` is what the tower reads; `permitt-app --select` is how it opens Permitt
-at a finding. Each tool stays complete and installable on its own.
-
+Permitt is a module of the [Blackberrylabs](https://github.com/blackberrylabs) family —
+read-only tools that show what AI coding agents do to your machine. Want only Permitt?
+It is complete on its own. Want several? The
+[control tower](https://github.com/blackberrylabs/blackberrylabs) gathers what every
+module finds in one list, most serious first: `permitt report` is what it reads, `permitt-app --select`
+is how it opens Permitt at a finding.
 ## How it is built
 
 A Rust workspace: `crates/core` (rules, sheets, shell scan, findings — no UI, no network),
