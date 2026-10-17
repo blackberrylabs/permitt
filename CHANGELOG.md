@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [0.2.0] — 2026-10-17
+
+Permitt becomes a module of the Blackberrylabs control tower.
 
 ### Added
 
