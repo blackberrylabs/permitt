@@ -142,8 +142,10 @@ journal are kept in French at the root; code, comments and documentation are in 
 
 By [Alexandre Do](https://github.com/blackberrylabs), who also made
 [MCProster](https://github.com/blackberrylabs/mcproster) (every MCP server on your machine,
-in one list) and [Cleanator](https://github.com/blackberrylabs/cleanator) (a disk cleaner for
-developers who run AI on Linux) — same principle: show, explain, never act in your place.
+in one list), [Cleanator](https://github.com/blackberrylabs/cleanator) (a disk cleaner for
+developers who run AI on Linux) and [Linstruct](https://github.com/blackberrylabs/linstruct)
+(your AI instruction files as each agent reads them) — same principle: show, explain, never
+act in your place.
 
 ## License
 
