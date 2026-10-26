@@ -3,6 +3,15 @@
 
 ---
 
+## 2026-10-26, passation à OpenCode
+
+- `AGENTS.md` ajouté : source unique des règles pour OpenCode et tout autre agent. OpenCode ne charge pas `CLAUDE.md` quand `AGENTS.md` existe (documentation d'OpenCode lue le 2026-10-26). `CLAUDE.md` devient un pointeur (`@AGENTS.md`) avec deux lignes propres à Claude. Le bloc commun d'`AGENTS.md` est identique dans les douze dépôts de la série.
+- `opencode.json` ajouté : tout ce qui pousse, tague, supprime, installe ou touche une minuterie demande confirmation ; les fichiers `.env` sont refusés ; `BRIEF.md` et `LICENSE` demandent confirmation à l'édition.
+- PLAN : trois cases cochées avec preuve (hostrules extrait, dépôt et commit 1 faits). Trois restent ouvertes et annotées : lanceurs, tableau des concurrents absent de `00_cadrage/`, textes de présentation.
+- Preuve : état de la série daté du 2026-10-26 dans `Logiciels/PASSATION.md`. Demandé par Alexandre le 2026-10-26.
+
+---
+
 ## 2026-10-17 — 0.2.0 publiee
 
 - Premiere release de la serie « modules de la tour » (ordre decide par Alexandre : Permitt

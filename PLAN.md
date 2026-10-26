@@ -7,14 +7,14 @@
 - [x] Six decisions une par une (D1–D6), nom verifie — 2026-10-16
 - [x] BRIEF rev. 1 ecrit — 2026-10-16
 - [x] Validation du BRIEF par Alexandre (D7 : SQLite hors v0) — 2026-10-16
-- [ ] `hostrules` extrait de MCProster (depot, tests), MCProster 0.2.1 migre dessus
+- [x] `hostrules` extrait de MCProster (depot, tests), MCProster 0.2.1 migre dessus (`bbl-hostrules` v0.5.0 existe, MCProster 0.2.1 publie) — 2026-10-26
 - [x] Sources des reglages de permission, 16 hotes (doc + code source), 4 rapports + synthese dans `00_cadrage/` — 2026-10-16
 - [x] D8 `judged`, D9 defauts sources, D10 hotes a reglage non lisible — validees ; observation machine (Cursor → `state.vscdb` confirme) — 2026-10-16
 - [x] Schema des regles Permitt valide (D11) — 2026-10-16
 - [x] hostrules 0.2.0 : extension par hote, tag pousse — 2026-10-16
-- [ ] lanceurs `.desktop` / `~/.local/bin` : a trancher a l'ecriture du lecteur de shell
-- [ ] Concurrents verifies (cc-safe-setup, guides, bacs a sable) — tableau dans `00_cadrage/`
-- [ ] Depot git local, identite noreply **avant le premier commit**, `.gitignore`, LICENSE MIT, README — fichiers ecrits, commit 1 a lancer
+- [ ] lanceurs `.desktop` / `~/.local/bin` : a trancher a l'ecriture du lecteur de shell — au 2026-10-26 : non tranche, repris sous « Apres 0.1.0 »
+- [ ] Concurrents verifies (cc-safe-setup, guides, bacs a sable) — tableau dans `00_cadrage/` — au 2026-10-26 : cc-safe-setup est cite dans le BRIEF, mais le tableau n'existe pas dans `00_cadrage/`
+- [x] Depot git local, identite noreply avant le premier commit, `.gitignore`, LICENSE MIT, README — commit 1 (2ebe97c), depot public `blackberrylabs/permitt` — 2026-10-26
 
 ## Etape 1. Regles et coeur
 - [x] Modele, extension de regles (D11), traducteurs de motifs, lecteur de shell, resolution, constats — 2026-10-16
@@ -33,7 +33,7 @@
 - [x] Depot public blackberrylabs/permitt, push, tag v0.1.0, release avec les 3 paquets ; verifie depuis le cloud (sommes, binaire, arborescence, 00_cadrage absent) — 2026-10-16
 ## Etape 5. README, captures, textes — decision d'Alexandre
 - [x] README avec captures et « Reading the sheet » — 2026-10-16
-- [ ] Textes de presentation (posts) — decision d'Alexandre, pas le jour de la release
+- [ ] Textes de presentation (posts) — decision d'Alexandre, pas le jour de la release ; plan de promotion : `Logiciels/Blackberrylabs/00_cadrage/promotion.md`
 
 ## Vers 0.2 — module de la tour de controle
 - [x] `permitt report` (`bbl-report/1`), `--select` dans l'app, mapping des gravites dans le CHANGELOG — 2026-10-16
